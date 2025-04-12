@@ -29,6 +29,10 @@ const rewardSchema = new mongoose.Schema({
   quantity: {
     type: Number,
     default: -1 // -1 means unlimited
+  },
+  image: {
+    type: String,
+    required: true
   }
 }, {
   timestamps: true

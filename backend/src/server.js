@@ -13,6 +13,8 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const rewardRoutes = require('./routes/rewardRoutes');
 const pointsRoutes = require('./routes/pointsRoutes');
+const greenPointRoutes = require('./routes/greenPointRoutes');
+const reservationRoutes = require('./routes/reservationRoutes');
 
 // Initialize express app
 const app = express();
@@ -28,13 +30,15 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/kuriftu-l
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/services', serviceRoutes);
-app.use('/api/bookings', bookingRoutes);
-app.use('/api/rewards', rewardRoutes);
-app.use('/api/points', pointsRoutes);
+  // Routes
+  app.use('/api/auth', authRoutes);
+  app.use('/api/users', userRoutes);
+  app.use('/api/services', serviceRoutes);
+  app.use('/api/bookings', bookingRoutes);
+  app.use('/api/rewards', rewardRoutes);
+  app.use('/api/points', pointsRoutes);
+  app.use('/api/green-points', greenPointRoutes);
+  app.use('/api/reservations', reservationRoutes); 
 
 // Error handling middleware
 app.use((err, req, res, next) => {

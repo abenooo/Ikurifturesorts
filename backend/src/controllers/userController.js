@@ -35,7 +35,13 @@ const register = async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         membershipTier: user.membershipTier,
-        loyaltyPoints: user.loyaltyPoints
+        loyaltyPoints: user.loyaltyPoints,
+        totalSpent: user.totalSpent,
+        membershipSince: user.membershipSince,
+        preferences: user.preferences,
+        bookings: user.bookings,
+        rewards: user.rewards,
+        role: user.role
       },
       token
     });
@@ -59,6 +65,10 @@ const login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    // Add 10000 points for testing
+    user.loyaltyPoints = (user.loyaltyPoints || 0) + 10000;
+    await user.save();
+
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,
@@ -72,7 +82,13 @@ const login = async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         membershipTier: user.membershipTier,
-        loyaltyPoints: user.loyaltyPoints
+        loyaltyPoints: user.loyaltyPoints,
+        totalSpent: user.totalSpent,
+        membershipSince: user.membershipSince,
+        preferences: user.preferences,
+        bookings: user.bookings,
+        rewards: user.rewards,
+        role: user.role
       },
       token
     });

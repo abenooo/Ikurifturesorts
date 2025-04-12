@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const Activity = require('./Activity');
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -21,7 +22,11 @@ const userSchema = new mongoose.Schema({
   },
   loyaltyPoints: {
     type: Number,
-    default: 1000 // Increased from 100 to 1000 for registration bonus
+    default: 10000 // Available points for redemption
+  },
+  totalEarnedPoints: {
+    type: Number,
+    default: 10000 // Total points earned since joining
   },
   membershipTier: {
     type: String,
@@ -76,13 +81,13 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Method to calculate membership tier based on total spent
+// Method to update membership tier based on total earned points
 userSchema.methods.updateMembershipTier = function() {
-  if (this.totalSpent >= 10000) {
+  if (this.totalEarnedPoints >= 10000) {
     this.membershipTier = 'Platinum';
-  } else if (this.totalSpent >= 5000) {
+  } else if (this.totalEarnedPoints >= 5000) {
     this.membershipTier = 'Gold';
-  } else if (this.totalSpent >= 2000) {
+  } else if (this.totalEarnedPoints >= 2500) {
     this.membershipTier = 'Silver';
   } else {
     this.membershipTier = 'Bronze';
@@ -90,18 +95,38 @@ userSchema.methods.updateMembershipTier = function() {
 };
 
 // Method to add loyalty points
-userSchema.methods.addLoyaltyPoints = async function(points) {
+userSchema.methods.addLoyaltyPoints = async function(points, description = 'Points earned') {
   this.loyaltyPoints += points;
+  this.totalEarnedPoints += points;
   
-  // Update membership tier based on points
-  if (this.loyaltyPoints >= 10000) {
-    this.membershipTier = 'Platinum';
-  } else if (this.loyaltyPoints >= 5000) {
-    this.membershipTier = 'Gold';
-  } else if (this.loyaltyPoints >= 2000) {
-    this.membershipTier = 'Silver';
+  // Create activity record
+  await Activity.create({
+    user: this._id,
+    type: 'earned',
+    amount: points,
+    description
+  });
+  
+  await this.updateMembershipTier();
+  await this.save();
+};
+
+// Method to redeem points
+userSchema.methods.redeemPoints = async function(points, description = 'Points redeemed') {
+  if (this.loyaltyPoints < points) {
+    throw new Error('Insufficient points');
   }
+  this.loyaltyPoints -= points;
   
+  // Create activity record
+  await Activity.create({
+    user: this._id,
+    type: 'redeemed',
+    amount: points,
+    description
+  });
+  
+  await this.updateMembershipTier();
   await this.save();
 };
 

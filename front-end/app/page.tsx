@@ -19,8 +19,9 @@ export default function Home() {
   const { user, token,setUser  } = useUserStore()
   const handleLogin = (userData: any) => {
     // Store user data in localStorage for persistence
+    console.log('---------------',userData)
     localStorage.setItem("kuriftuUser", JSON.stringify(userData))
-    setUser(userData, token)
+    setUser(userData.user, userData.token)
   }
 
   const handleEarnPoints = (amount: number, description: string) => {

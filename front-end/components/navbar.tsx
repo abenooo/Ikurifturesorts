@@ -16,10 +16,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { user, token, setUser, clearUser } = useUserStore()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  
-  const navbarBg = isScrolled ? "bg-white shadow-md" : "bg-transparent"
-  const textColor = isScrolled ? "text-gray-800" : "text-white"
-  const isDashboard = pathname === "/dashboard"
+  // const storedUser = localStorage.getItem("kuriftuUser")
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,13 +65,11 @@ export default function Navbar() {
     clearUser()
     router.push("/")
   }
-
-  useEffect(() => {
-    console.log("Current user:", user)
-    console.log("LocalStorage user:", localStorage.getItem("kuriftuUser"))
-  }, [user])
-
-
+  const handleLogin = (userData: any) => {
+    // Store user data in localStorage for persistence
+    localStorage.setItem("kuriftuUser", JSON.stringify(userData))
+    setUser(userData, token)
+  }
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navbarBg}`}>
@@ -113,9 +108,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-md border border-amber-200">
                     <User className="h-4 w-4 text-amber-600" />
-                    <span className="text-sm font-medium text-gray-800">
-                      {(user.loyaltyPoints || 0).toLocaleString()} points
-                    </span>
+                    <span className="text-sm font-medium text-gray-800">{userData?.points?.toLocaleString() || '0'} points</span>
                   </div>
                   <Button variant="outline" onClick={handleLogout} className="h-8">
                     Logout
