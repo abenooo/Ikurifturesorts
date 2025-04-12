@@ -1,107 +1,163 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Loader2, Gift } from 'lucide-react'
-import { ServiceDetails, ServiceVariant } from '@/types/booking'
-import { DateRangePicker } from './date-range-picker'
-
-// Default service variants
-const DEFAULT_VARIANTS: ServiceVariant[] = [
-  {
-    id: 'standard',
-    name: 'Standard',
-    description: 'Regular booking',
-    basePrice: 0, // Will be set based on service price
-    pointsPerGuest: 100,
-    maxGuests: 4,
-    priceMultiplier: 1,
-    bonusPoints: 0
-  },
-  {
-    id: 'premium',
-    name: 'Premium',
-    description: 'Enhanced experience with special perks',
-    basePrice: 0, // Will be set based on service price
-    pointsPerGuest: 200,
-    maxGuests: 6,
-    priceMultiplier: 1.5,
-    bonusPoints: 100
-  }
-]
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { format } from "date-fns"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CalendarIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+import { GuestSelector } from "./guest-selector"
+import { VariantSelector } from "./variant-selector"
+import { TotalSection } from "./total-section"
+import { RewardsSection } from "./rewards-section"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
+import { ServiceDetails, ServiceVariant } from "@/types/booking"
 
 interface BookingFormProps {
   service: ServiceDetails
   userPoints: number
 }
 
+const DEFAULT_VARIANT: ServiceVariant = {
+  id: "default",
+  name: "Standard",
+  description: "Regular booking",
+  basePrice: 0,
+  pointsPerGuest: 1,
+  maxGuests: 2,
+  priceMultiplier: 1,
+  bonusPoints: 0
+}
+
 export function BookingForm({ service, userPoints }: BookingFormProps) {
   const router = useRouter()
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
+  const [userData, setUserData] = useState<any>(null)
+  
+  // Load user data from localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem('kuriftuUser')
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser)
+        setUserData(parsedUser)
+      } catch (error) {
+        console.error('Error parsing user data:', error)
+      }
+    }
+  }, [])
+
+  // Extract membership tier from user data
+  const actualUser = userData?.state?.user?.user || userData?.user || userData
+  const membershipTier = actualUser?.membershipTier || 'Bronze'
+
+  const variants = service.variants && service.variants.length > 0 ? service.variants : [DEFAULT_VARIANT]
+
+  // State
+  const [startDate, setStartDate] = useState<Date | undefined>(undefined)
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState("")
   const [guests, setGuests] = useState(1)
-  const [selectedVariant, setSelectedVariant] = useState<ServiceVariant>({
-    ...DEFAULT_VARIANTS[0],
-    basePrice: service.basePrice
-  })
+  const [selectedVariant, setSelectedVariant] = useState<ServiceVariant>(variants[0])
   const [isLoading, setIsLoading] = useState(false)
   const [usePoints, setUsePoints] = useState(false)
+  const [pointsToUse, setPointsToUse] = useState(0)
 
-  // Initialize variants with service price
-  const variants: ServiceVariant[] = DEFAULT_VARIANTS.map(variant => ({
-    ...variant,
-    basePrice: variant.id === 'premium' ? service.basePrice * 1.5 : service.basePrice
-  }))
+  const maxGuests = service.maxGuests || 2
 
+  // Calculate the number of days between dates
+  const calculateDays = () => {
+    if (!startDate) return 1 // Default to 1 day if no date selected
+    const end = endDate || startDate
+    const timeDiff = end.getTime() - startDate.getTime()
+    return Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1
+  }
+
+  // Calculate base total before any discounts
+  const calculateBaseTotal = () => {
+    const days = calculateDays()
+    const price = selectedVariant?.basePrice || service.basePrice || 0
+    return price * days * guests
+  }
+
+  // Calculate maximum allowed points discount (20% of total)
+  const calculateMaxPointsDiscount = () => {
+    return calculateBaseTotal() * 0.2
+  }
+
+  // Calculate final total after points discount
   const calculateTotal = () => {
-    if (!dateRange[0] || !dateRange[1]) return 0
-    const nights = Math.ceil((dateRange[1].getTime() - dateRange[0].getTime()) / (1000 * 60 * 60 * 24))
-    const baseTotal = selectedVariant.basePrice * guests * nights
-    if (usePoints) {
-      const pointsDiscount = Math.min(userPoints, baseTotal * 0.2)
-      return baseTotal - pointsDiscount
-    }
-    return baseTotal
+    const baseTotal = calculateBaseTotal()
+    if (!usePoints || pointsToUse <= 0) return baseTotal
+
+    const pointsValue = Math.min(pointsToUse, calculateMaxPointsDiscount())
+    return Math.max(0, baseTotal - pointsValue)
   }
 
+  // Calculate reward points earned from this booking
   const calculateRewardPoints = () => {
-    if (!dateRange[0] || !dateRange[1]) return 0
-    const nights = Math.ceil((dateRange[1].getTime() - dateRange[0].getTime()) / (1000 * 60 * 60 * 24))
-    return selectedVariant.pointsPerGuest * guests * nights
+    const days = calculateDays()
+    const basePoints = service.rewardPoints || 0
+    const variantBonus = selectedVariant?.bonusPoints || 0
+    return Math.floor((basePoints + variantBonus) * days * guests)
   }
 
+  // Handle points usage change
+  const handlePointsChange = (use: boolean) => {
+    setUsePoints(use)
+    if (use) {
+      const maxAllowed = Math.min(userPoints, calculateMaxPointsDiscount())
+      setPointsToUse(maxAllowed > 0 ? maxAllowed : 0)
+    } else {
+      setPointsToUse(0)
+    }
+  }
+
+  // Update points to use when base total changes
+  useEffect(() => {
+    if (usePoints) {
+      const maxAllowed = Math.min(userPoints, calculateMaxPointsDiscount())
+      setPointsToUse(prev => Math.min(prev, maxAllowed))
+    }
+  }, [calculateBaseTotal(), usePoints, userPoints])
+
+  // Handle booking submission
   const handleBooking = async () => {
-    if (!dateRange[0] || !selectedTime) {
-      alert("Please select dates and time")
+    if (!startDate || !selectedTime) {
+      alert("Please select at least a start date and time")
       return
     }
 
     setIsLoading(true)
+
     try {
+      const bookingData = {
+        serviceId: service.id,
+        startDate,
+        endDate: endDate || startDate,
+        time: selectedTime,
+        guests,
+        variant: selectedVariant.name,
+        totalPrice: calculateTotal(),
+        totalPoints: calculateRewardPoints()
+      }
+
       const response = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          serviceId: service.id,
-          startDate: dateRange[0],
-          endDate: dateRange[1],
-          time: selectedTime,
-          guests,
-          variant: selectedVariant.id,
-          usePoints,
-          total: calculateTotal(),
-          earnedPoints: calculateRewardPoints(),
-        }),
+        body: JSON.stringify(bookingData),
       })
 
       if (!response.ok) throw new Error("Booking failed")
-      router.push("/bookings/success")
+
+      const result = await response.json()
+      router.push(`/bookings/${result.bookingId || "success"}`)
     } catch (error) {
+      console.error("Booking error:", error)
       alert("Failed to complete booking")
     } finally {
       setIsLoading(false)
@@ -111,20 +167,63 @@ export function BookingForm({ service, userPoints }: BookingFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Book Your Experience</CardTitle>
+        <CardTitle>Book {service.name}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
+      <CardContent className="space-y-6">
+        {/* Date Selection */}
+        <div className="space-y-2">
           <Label>Select Dates</Label>
-          <div className="mt-2">
-            <DateRangePicker
-              startDate={dateRange[0]}
-              endDate={dateRange[1]}
-              onChange={setDateRange}
-            />
+          <div className="grid gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn("w-full justify-start text-left font-normal", !startDate && "text-muted-foreground")}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {startDate ? (
+                    endDate ? (
+                      <>
+                        {format(startDate, "LLL dd, y")} - {format(endDate, "LLL dd, y")}
+                      </>
+                    ) : (
+                      format(startDate, "LLL dd, y")
+                    )
+                  ) : (
+                    <span>Select date range</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={startDate}
+                  selected={{
+                    from: startDate,
+                    to: endDate,
+                  }}
+                  onSelect={(range) => {
+                    if (!range?.from) return
+                    setStartDate(range.from)
+                    setEndDate(range.to || range.from)
+                  }}
+                  numberOfMonths={2}
+                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
+          {startDate && (
+            <p className="text-sm text-muted-foreground">
+              {format(startDate, "MMMM d, yyyy")} 
+              {endDate && ` - ${format(endDate, "MMMM d, yyyy")}`}
+              {!endDate && " (1 day)"}
+            </p>
+          )}
         </div>
 
+        {/* Time Selection */}
         <div>
           <Label>Check-in Time</Label>
           <Select value={selectedTime} onValueChange={setSelectedTime}>
@@ -132,7 +231,7 @@ export function BookingForm({ service, userPoints }: BookingFormProps) {
               <SelectValue placeholder="Select time" />
             </SelectTrigger>
             <SelectContent>
-              {['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'].map((time) => (
+              {["09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM"].map((time) => (
                 <SelectItem key={time} value={time}>
                   {time}
                 </SelectItem>
@@ -141,80 +240,62 @@ export function BookingForm({ service, userPoints }: BookingFormProps) {
           </Select>
         </div>
 
-        <div>
-          <Label>Number of Guests</Label>
-          <Input
-            type="number"
-            min={1}
-            max={selectedVariant.maxGuests}
-            value={guests}
-            onChange={(e) => setGuests(parseInt(e.target.value))}
+        {/* Guest Selection */}
+        <GuestSelector 
+          guests={guests} 
+          setGuests={setGuests} 
+          maxGuests={maxGuests} 
+        />
+
+        {/* Variant Selection */}
+        {variants.length > 1 && (
+          <VariantSelector 
+            variants={variants} 
+            onSelect={(variant) => setSelectedVariant(variant)} 
           />
-        </div>
+        )}
 
-        <div>
-          <Label>Experience Type</Label>
-          <Select
-            value={selectedVariant.id}
-            onValueChange={(value) => 
-              setSelectedVariant(variants.find(v => v.id === value) || variants[0])
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select variant" />
-            </SelectTrigger>
-            <SelectContent>
-              {variants.map((variant) => (
-                <SelectItem key={variant.id} value={variant.id}>
-                  <div>
-                    <div className="font-medium">{variant.name}</div>
-                    <div className="text-sm text-gray-500">{variant.description}</div>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Rewards Section */}
+        <RewardsSection
+          usePoints={usePoints}
+          setUsePoints={handlePointsChange}
+          earnedPoints={calculateRewardPoints()}
+          userPoints={userPoints}
+          membershipTier={membershipTier}
+          pointsToUse={pointsToUse}
+          maxPointsToUse={Math.min(userPoints, calculateMaxPointsDiscount())}
+          onPointsChange={setPointsToUse}
+        />
 
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="usePoints"
-            checked={usePoints}
-            onChange={(e) => setUsePoints(e.target.checked)}
-          />
-          <Label htmlFor="usePoints" className="flex items-center space-x-2">
-            <Gift className="h-4 w-4" />
-            <span>Use {Math.min(userPoints, calculateTotal() * 0.2)} points for discount</span>
-          </Label>
-        </div>
-
+        {/* Price Summary */}
         <div className="pt-4 border-t">
           <div className="flex justify-between text-sm">
-            <span>Total Price:</span>
-            <span className="font-bold">${calculateTotal()}</span>
+            <span>Base Price:</span>
+            <span>${calculateBaseTotal().toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-sm text-green-600">
+          {usePoints && pointsToUse > 0 && (
+            <div className="flex justify-between text-sm text-amber-600">
+              <span>Points Discount:</span>
+              <span>-${Math.min(pointsToUse, calculateMaxPointsDiscount()).toFixed(2)}</span>
+            </div>
+          )}
+          <div className="flex justify-between text-sm font-bold mt-2">
+            <span>Total Price:</span>
+            <span>${calculateTotal().toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-sm text-green-600 mt-2">
             <span>Points to Earn:</span>
             <span>+{calculateRewardPoints()}</span>
           </div>
         </div>
 
-        <Button
-          className="w-full"
-          onClick={handleBooking}
-          disabled={!dateRange[0] || !dateRange[1] || !selectedTime || isLoading}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing
-            </>
-          ) : (
-            'Confirm Booking'
-          )}
-        </Button>
+        <TotalSection
+          total={calculateTotal()}
+          isLoading={isLoading}
+          onBook={handleBooking}
+          disabled={!startDate || !selectedTime || guests < 1 || guests > maxGuests}
+        />
       </CardContent>
     </Card>
   )
-} 
+}

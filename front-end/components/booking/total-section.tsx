@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 
@@ -15,11 +17,7 @@ export function TotalSection({ total, isLoading, onBook, disabled }: TotalSectio
         <span className="text-lg font-medium">Total</span>
         <span className="text-2xl font-bold">${total.toFixed(2)}</span>
       </div>
-      <Button
-        className="w-full bg-amber-600 hover:bg-amber-700"
-        onClick={onBook}
-        disabled={isLoading || disabled}
-      >
+      <Button className="w-full bg-amber-600 hover:bg-amber-700" onClick={onBook} disabled={isLoading || disabled}>
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -31,4 +29,4 @@ export function TotalSection({ total, isLoading, onBook, disabled }: TotalSectio
       </Button>
     </div>
   )
-} 
+}

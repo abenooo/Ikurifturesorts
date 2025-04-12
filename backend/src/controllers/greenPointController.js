@@ -4,14 +4,13 @@ const User = require('../models/User');
 // Get user's total green points
 const getUserGreenPoints = async (req, res) => {
   try {
-    // The user is already attached to req by the auth middleware
-    if (!req.user) {
-      return res.status(401).json({ message: 'User not authenticated' });
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
     const greenPoints = await GreenPoint.find({ 
-      user: req.user._id
-      // Removed status filter to get all points
+      user: user._id
     });
 
     const totalPoints = greenPoints.reduce((sum, point) => sum + point.points, 0);
@@ -21,7 +20,6 @@ const getUserGreenPoints = async (req, res) => {
       actions: greenPoints
     });
   } catch (error) {
-    console.error('Error fetching green points:', error);
     res.status(500).json({ message: 'Error fetching green points', error: error.message });
   }
 };

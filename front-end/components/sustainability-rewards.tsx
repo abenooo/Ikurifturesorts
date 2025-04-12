@@ -1,11 +1,12 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Leaf, Droplets, Recycle, Sun, AlertCircle, CheckCircle2 } from "lucide-react"
+import { Leaf, Droplets, Recycle, Sun, AlertCircle, CheckCircle2, CloudCog } from "lucide-react"
+import { useUserStore } from "@/store/userStore"
+import { toast } from "sonner"
 
 interface EcoAction {
   id: string
@@ -15,63 +16,132 @@ interface EcoAction {
   description: string
 }
 
-const ecoActions: EcoAction[] = [
-  {
-    id: "towels",
-    icon: <Droplets className="h-5 w-5" />,
-    title: "Reuse Towels",
-    points: 50,
-    description: "Hang your towels to reuse them during your stay",
-  },
-  {
-    id: "housekeeping",
-    icon: <Recycle className="h-5 w-5" />,
-    title: "Skip Housekeeping",
-    points: 100,
-    description: "Opt out of daily housekeeping service",
-  },
-  {
-    id: "solar",
-    icon: <Sun className="h-5 w-5" />,
-    title: "Solar-Powered Boat Tour",
-    points: 75,
-    description: "Choose our eco-friendly solar boat tour option",
-  },
-  {
-    id: "local",
-    icon: <Leaf className="h-5 w-5" />,
-    title: "Local Food Options",
-    points: 60,
-    description: "Choose meals prepared with locally-sourced ingredients",
-  },
-]
+const actionIcons = {
+  towels: <Droplets className="h-5 w-5" />,
+  housekeeping: <Recycle className="h-5 w-5" />,
+  solar: <Sun className="h-5 w-5" />,
+  local: <Leaf className="h-5 w-5" />
+}
 
 export default function SustainabilityRewards() {
   const [points, setPoints] = useState(0)
   const [selectedActions, setSelectedActions] = useState<string[]>([])
   const [showAuthPopup, setShowAuthPopup] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [ecoActions, setEcoActions] = useState<EcoAction[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const { user, token } = useUserStore()
+
+  useEffect(() => {
+    const fetchGreenPoints = async () => {
+      if (!token) return;
+
+      try {
+        const [actionsResponse, pointsResponse] = await Promise.all([
+          fetch("https://i-kuriftu.onrender.com/api/green-points/actions", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          }),
+          fetch("https://i-kuriftu.onrender.com/api/green-points/my-points", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          })
+        ]);
+
+        if (!actionsResponse.ok || !pointsResponse.ok) {
+          throw new Error('Failed to fetch green points data');
+        }
+
+        const actionsData = await actionsResponse.json();
+        const pointsData = await pointsResponse.json();
+
+        console.log('Actions Data:', actionsData);
+        console.log('Points Data:', pointsData);
+
+        // Transform actions data to include icons
+        const transformedActions = actionsData.map((action: any) => ({
+          ...action,
+          icon: actionIcons[action.id as keyof typeof actionIcons]
+        }));
+
+        setEcoActions(transformedActions);
+        // Ensure we're using the correct points value
+        const totalPoints = pointsData.totalPoints || 0;
+        setPoints(totalPoints);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Error fetching green points:", error);
+        toast.error("Failed to load green points data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchGreenPoints();
+  }, [token]);
 
   const handleActionToggle = (actionId: string) => {
-    if (selectedActions.includes(actionId)) {
-      // Remove action and subtract points
-      const action = ecoActions.find((a) => a.id === actionId)
-      if (action) {
-        setPoints(points - action.points)
-      }
-      setSelectedActions(selectedActions.filter((id) => id !== actionId))
-    } else {
-      // Add action and add points
-      const action = ecoActions.find((a) => a.id === actionId)
-      if (action) {
-        setPoints(points + action.points)
-      }
-      setSelectedActions([...selectedActions, actionId])
+    if (!token) {
+      setShowAuthPopup(true);
+      return;
     }
+
+    setSelectedActions(prev => {
+      if (prev.includes(actionId)) {
+        return prev.filter(id => id !== actionId);
+      } else {
+        return [...prev, actionId];
+      }
+    });
   }
 
-  const handleLinkStay = () => {
-    setShowAuthPopup(true)
+  const handleLinkStay = async () => {
+    if (!token) {
+      setShowAuthPopup(true);
+      return;
+    }
+
+    try {
+      let totalPointsEarned = 0;
+      // Submit all selected actions
+      for (const actionId of selectedActions) {
+        const action = ecoActions.find((a) => a.id === actionId);
+        if (!action) continue;
+
+        const response = await fetch("https://i-kuriftu.onrender.com/api/green-points/submit", {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            action: actionId,
+            description: action.description
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to submit green action');
+        }
+
+        const data = await response.json();
+        totalPointsEarned += action.points;
+      }
+
+      // Update points after all actions are submitted
+      setPoints(prevPoints => prevPoints + totalPointsEarned);
+      toast.success(`Successfully earned ${totalPointsEarned} green points!`);
+      setSelectedActions([]);
+      setIsAuthenticated(true);
+      setShowAuthPopup(false);
+    } catch (error) {
+      console.error("Error submitting green actions:", error);
+      toast.error("Failed to submit green actions");
+    }
   }
 
   const handleAuthSubmit = () => {
@@ -81,6 +151,18 @@ export default function SustainabilityRewards() {
   }
 
   const progressPercentage = Math.min((points / 500) * 100, 100)
+
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden p-6 md:p-8">
+          <div className="flex items-center justify-center py-12">
+            <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -149,7 +231,14 @@ export default function SustainabilityRewards() {
 
           {/* CTA */}
           <div className="text-center">
-            {isAuthenticated ? (
+            {selectedActions.length > 0 ? (
+              <Button 
+                onClick={handleLinkStay} 
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                Link Selected Actions ({selectedActions.length})
+              </Button>
+            ) : isAuthenticated ? (
               <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
                 <p className="text-emerald-800 font-medium mb-2">Your stay is linked!</p>
                 <p className="text-sm text-gray-600">

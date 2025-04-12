@@ -27,10 +27,33 @@ export default function BookingPage() {
           throw new Error('Failed to fetch service details')
         }
         const data = await response.json()
-        setService(data)
+        
+        // Transform the response to match ServiceDetails type
+        const transformedService: ServiceDetails = {
+          id: data._id,
+          name: data.name,
+          description: data.description,
+          images: data.images,
+          duration: data.duration,
+          basePrice: data.basePrice,
+          maxGuests: data.maxGuests,
+          rewardPoints: data.rewardPoints,
+          variants: data.variants?.map((variant: any) => ({
+            id: variant._id,
+            name: variant.name,
+            description: variant.description,
+            basePrice: variant.basePrice,
+            pointsPerGuest: variant.pointsPerGuest,
+            maxGuests: variant.maxGuests,
+            priceMultiplier: variant.priceMultiplier,
+            bonusPoints: variant.bonusPoints
+          })) || []
+        }
+        
+        setService(transformedService)
 
         // Fetch user points from localStorage
-        const userData = localStorage.getItem('userData')
+        const userData = localStorage.getItem('kuriftuUser')
         if (userData) {
           const { points } = JSON.parse(userData)
           setUserPoints(points || 0)

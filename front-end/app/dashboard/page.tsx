@@ -63,6 +63,7 @@ export default function Dashboard() {
   const [activities, setActivities] = useState<Activity[]>([])
   const [bookings, setBookings] = useState<Booking[]>([])
   const [redemptions, setRedemptions] = useState<Redemption[]>([])
+  const [greenPoints, setGreenPoints] = useState(0)
   const { user, token, setUser, clearUser } = useUserStore()
   const [isLoadingActivities, setIsLoadingActivities] = useState(true)
   const [isLoadingBookings, setIsLoadingBookings] = useState(true)
@@ -199,6 +200,37 @@ export default function Dashboard() {
     }
   };
 
+  const fetchGreenPoints = async () => {
+    try {
+      if (!token) {
+        console.log("No token available");
+        return;
+      }
+      
+      const response = await fetch(
+        "https://i-kuriftu.onrender.com/api/green-points/my-points",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch green points');
+      }
+      
+      const data = await response.json();
+      console.log("Green points data:", data);
+      setGreenPoints(data.totalPoints || 0);
+    } catch (error: any) {
+      console.error("Error fetching green points:", error);
+      toast.error(error?.message || "Failed to load green points");
+    }
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem("kuriftuUser");
     if (storedUser) {
@@ -226,9 +258,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (token) {
+      console.log("fetching activities",token);
       fetchActivities();
       fetchBookings();
       fetchRedemptions();
+      fetchGreenPoints();
     }
   }, [token]);
 
@@ -447,13 +481,13 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-sm border flex items-center gap-4">
-                  <div className="bg-amber-100 p-3 rounded-full">
-                    <Leaf className="h-6 w-6 text-amber-600" />
+                <div className="bg-emerald-100 p-4 rounded-lg shadow-sm border flex items-center gap-4">
+                  <div className="bg-emerald-100 p-3 rounded-full">
+                    <Leaf className="h-6 w-6 text-emerald-600" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Green Points</p>
-                    <p className="text-2xl font-bold text-emerald-600">120</p>
+                    <p className="text-2xl font-bold text-emerald-600">{greenPoints.toLocaleString()}</p>
                   </div>
                 </div>
               </div>

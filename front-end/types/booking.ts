@@ -11,7 +11,7 @@ export interface ServiceVariant {
 
 export interface ServiceDetails {
   id: string
-  title: string
+  name: string
   description: string
   images?: string[]
   duration: string
