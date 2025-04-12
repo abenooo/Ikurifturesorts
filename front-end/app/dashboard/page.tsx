@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Gift, Award, Calendar, ChevronRight, Leaf, Sparkles, ArrowUpRight, ArrowDownRight } from "lucide-react"
 import RewardsCatalog, { type Reward } from "@/components/rewards-catalog"
 import WaysToEarn from "@/components/ways-to-earn"
+import { useUserStore } from "@/store/userStore"
 
 interface PointActivity {
   id: string
@@ -25,6 +26,7 @@ export default function Dashboard() {
   const [userData, setUserData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [activities, setActivities] = useState<PointActivity[]>([])
+  const { user, token, setUser, clearUser } = useUserStore()
 
   useEffect(() => {
     // Get user data from localStorage
@@ -107,6 +109,9 @@ export default function Dashboard() {
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem("kuriftuUser")
+    setUserData(null)
+    setUser(null, null)
+    clearUser()
     router.push("/")
   }
 

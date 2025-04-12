@@ -9,21 +9,16 @@ import SustainabilityRewards from "@/components/sustainability-rewards"
 import  ServicesShowcase from "@/components/services-showcase"
 import WaitlistForm from "@/components/waitlist-form"
 import AuthModal from "@/components/auth-modal"
-
-interface UserData {
-  name: string
-  email: string
-  points: number
-  tier: string
-  joinDate: string
-}
+import { useUserStore } from "@/store/userStore"
+import type { UserData } from "@/store/userStore"
 
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-
-  const handleLogin = (userData: UserData) => {
+  const { user, token,setUser  } = useUserStore()
+  const handleLogin = (userData: any) => {
     // Store user data in localStorage for persistence
     localStorage.setItem("kuriftuUser", JSON.stringify(userData))
+    setUser(userData, token)
   }
 
   return (

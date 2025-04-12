@@ -137,7 +137,8 @@ export default function AuthModal({
   const [isLoggingIn, setIsLoggingIn] = useState(false)
 
   // Register form state
-  const [registerName, setRegisterName] = useState("")
+  const [registerFirstName, setRegisterFirstName] = useState("")
+  const [registerLastName, setRegisterLastName] = useState("")
   const [registerEmail, setRegisterEmail] = useState("")
   const [registerPassword, setRegisterPassword] = useState("")
   const [registerError, setRegisterError] = useState("")
@@ -157,7 +158,7 @@ export default function AuthModal({
     setIsLoggingIn(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/users/login`, {
+      const response = await fetch(`https://i-kuriftu.onrender.com/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },  
         body: JSON.stringify({
@@ -192,7 +193,7 @@ export default function AuthModal({
     e.preventDefault()
     setRegisterError("")
 
-    if (!registerName || !registerEmail || !registerPassword) {
+    if (!registerFirstName || !registerLastName || !registerEmail || !registerPassword) {
       setRegisterError("Please fill in all fields")
       return
     }
@@ -205,11 +206,12 @@ export default function AuthModal({
     setIsRegistering(true)
 
     try {
-      const response = await fetch('http://localhost:5000/api/users/register', {
+      const response = await fetch('https://i-kuriftu.onrender.com/api/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: registerName,
+          firstName: registerFirstName,
+          lastName: registerLastName,
           email: registerEmail,
           password: registerPassword
         })
@@ -304,16 +306,31 @@ export default function AuthModal({
           <TabsContent value="register">
             <form onSubmit={handleRegisterSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="register-name">Full Name</Label>
+                <Label htmlFor="register-first-name">First Name</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
-                    id="register-name"
+                    id="register-first-name"
                     type="text"
-                    value={registerName}
-                    onChange={(e) => setRegisterName(e.target.value)}
+                    value={registerFirstName}
+                    onChange={(e) => setRegisterFirstName(e.target.value)}
                     className="pl-9"
-                    placeholder="Your name"
+                    placeholder="First name"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="register-last-name">Last Name</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="register-last-name"
+                    type="text"
+                    value={registerLastName}
+                    onChange={(e) => setRegisterLastName(e.target.value)}
+                    className="pl-9"
+                    placeholder="Last name"
                   />
                 </div>
               </div>
