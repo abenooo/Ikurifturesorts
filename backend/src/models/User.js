@@ -92,17 +92,31 @@ userSchema.methods.updateMembershipTier = function() {
 // Method to add loyalty points
 userSchema.methods.addLoyaltyPoints = async function(points) {
   this.loyaltyPoints += points;
-  
-  // Update membership tier based on points
+  await this.updateMembershipTier();
+  await this.save();
+};
+
+// Method to redeem points
+userSchema.methods.redeemPoints = async function(points) {
+  if (this.loyaltyPoints < points) {
+    throw new Error('Insufficient points');
+  }
+  this.loyaltyPoints -= points;
+  await this.updateMembershipTier();
+  await this.save();
+};
+
+// Method to update membership tier based on points
+userSchema.methods.updateMembershipTier = async function() {
   if (this.loyaltyPoints >= 10000) {
     this.membershipTier = 'Platinum';
   } else if (this.loyaltyPoints >= 5000) {
     this.membershipTier = 'Gold';
-  } else if (this.loyaltyPoints >= 2000) {
+  } else if (this.loyaltyPoints >= 2500) {
     this.membershipTier = 'Silver';
+  } else {
+    this.membershipTier = 'Bronze';
   }
-  
-  await this.save();
 };
 
 // Calculate points from service price
