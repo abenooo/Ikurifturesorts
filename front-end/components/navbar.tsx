@@ -14,9 +14,13 @@ export default function Navbar() {
   const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [userData, setUserData] = useState<any>(null)
   const { user, token, setUser, clearUser } = useUserStore()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  // const storedUser = localStorage.getItem("kuriftuUser")
+  
+  const navbarBg = isScrolled ? "bg-white shadow-md" : "bg-transparent"
+  const textColor = isScrolled ? "text-gray-800" : "text-white"
+  const isDashboard = pathname === "/dashboard"
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +32,7 @@ export default function Navbar() {
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser)
+        setUserData(parsedUser)
         // Access the nested user object
         const actualUser = parsedUser.state?.user?.user || parsedUser.user || parsedUser
         const actualToken = parsedUser.state?.user?.token || parsedUser.token
@@ -64,11 +69,6 @@ export default function Navbar() {
     localStorage.removeItem("kuriftuUser")
     clearUser()
     router.push("/")
-  }
-  const handleLogin = (userData: any) => {
-    // Store user data in localStorage for persistence
-    localStorage.setItem("kuriftuUser", JSON.stringify(userData))
-    setUser(userData, token)
   }
 
   return (
@@ -108,7 +108,9 @@ export default function Navbar() {
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-md border border-amber-200">
                     <User className="h-4 w-4 text-amber-600" />
-                    <span className="text-sm font-medium text-gray-800">{userData?.points?.toLocaleString() || '0'} points</span>
+                    <span className="text-sm font-medium text-gray-800">
+                      {(user.loyaltyPoints || 0).toLocaleString()} points
+                    </span>
                   </div>
                   <Button variant="outline" onClick={handleLogout} className="h-8">
                     Logout
