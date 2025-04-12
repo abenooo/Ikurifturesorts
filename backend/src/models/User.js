@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
   },
   loyaltyPoints: {
     type: Number,
-    default: 1000 // Increased from 100 to 1000 for registration bonus
+    default: 10000 // Increased from 100 to 1000 for registration bonus
   },
   membershipTier: {
     type: String,

@@ -36,7 +36,13 @@ const signup = async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         loyaltyPoints: user.loyaltyPoints,
-        membershipTier: user.membershipTier
+        membershipTier: user.membershipTier,
+        totalSpent: user.totalSpent,
+        membershipSince: user.membershipSince,
+        preferences: user.preferences,
+        bookings: user.bookings,
+        rewards: user.rewards,
+        role: user.role
       },
       token
     });
@@ -76,7 +82,13 @@ const signin = async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         loyaltyPoints: user.loyaltyPoints,
-        membershipTier: user.membershipTier
+        membershipTier: user.membershipTier,
+        totalSpent: user.totalSpent,
+        membershipSince: user.membershipSince,
+        preferences: user.preferences,
+        bookings: user.bookings,
+        rewards: user.rewards,
+        role: user.role
       },
       token
     });
