@@ -7,6 +7,7 @@ import { useRouter, usePathname } from "next/navigation"
 import { Menu, X, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useUserStore } from "@/store/userStore"
+import AuthModal from "./auth-modal"
 
 interface UserData {
   name: string
@@ -23,7 +24,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [userData, setUserData] = useState<UserData | null>(null)
   const { user, token, setUser, clearUser } = useUserStore()
-  
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   // const storedUser = localStorage.getItem("kuriftuUser")
 
   useEffect(() => {
@@ -43,7 +44,18 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+  const handleEarnPoints = (amount: number, description: string) => {
+    // Check if user is logged in
+    const storedUser = localStorage.getItem("kuriftuUser")
+    if (!storedUser) {
+      // If not logged in, open auth modal
+      setIsAuthModalOpen(true)
+      return
+    }
 
+    // If logged in, navigate to dashboard
+    router.push("/dashboard")
+  }
   const isDashboard = pathname === "/dashboard"
   const navbarBg = isDashboard
     ? "bg-white shadow-md py-2"
@@ -60,11 +72,17 @@ export default function Navbar() {
     clearUser()
     router.push("/")
   }
+  const handleLogin = (userData: any) => {
+    // Store user data in localStorage for persistence
+    localStorage.setItem("kuriftuUser", JSON.stringify(userData))
+    setUser(userData, token)
+  }
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navbarBg}`}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between">
+          <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onLogin={handleLogin} />
           <Link href="/" className="flex items-center">
             <div className="relative h-10 w-32">
               <Image src="https://imgs.search.brave.com/5yZpZgY7fxZbMon2wonPZpeWTEF06hWHW-6dkH8Bn8A/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dGhlb3JnLmNvbS85/OTI4ZmJjZS1hMGY2/LTRmM2UtOWJhMS01/YWQ1YWFkNzJkMzFf/dGh1bWIuanBn" alt="Kuriftu Rewards" fill className="object-contain" />
@@ -125,7 +143,8 @@ export default function Navbar() {
             {!user && (
               <>
                 <Link
-                  href="#join-now"
+                  onClick={() => setIsAuthModalOpen(true)}
+                  href=""
                   className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-full transition-colors"
                 >
                   Join Now
@@ -202,9 +221,10 @@ export default function Navbar() {
               {!user && (
                 <>
                   <Link
-                    href="#join-now"
+                    href=""
                     className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-full transition-colors inline-block text-center"
-                    onClick={() => setIsMenuOpen(false)}
+
+                    onClick={() => setIsAuthModalOpen(true)}
                   >
                     Join Now
                   </Link>

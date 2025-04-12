@@ -190,9 +190,9 @@ export default function Dashboard() {
                 <span className="text-gray-500 text-sm">Member since {userData.joinDate}</span>
               </div>
             </div>
-            <Button variant="outline" onClick={handleLogout} className="mt-4 md:mt-0">
+            {/* <Button variant="outline" onClick={handleLogout} className="mt-4 md:mt-0">
               Logout
-            </Button>
+            </Button> */}
           </div>
 
           <Card>
