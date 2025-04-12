@@ -1,0 +1,23 @@
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+
+interface GuestSelectorProps {
+  guests: number
+  setGuests: (guests: number) => void
+  maxGuests: number
+}
+
+export function GuestSelector({ guests, setGuests, maxGuests }: GuestSelectorProps) {
+  return (
+    <div className="space-y-2">
+      <Label>Number of Guests</Label>
+      <Input
+        type="number"
+        min={1}
+        max={maxGuests}
+        value={guests}
+        onChange={(e) => setGuests(Number(e.target.value))}
+      />
+    </div>
+  )
+} 

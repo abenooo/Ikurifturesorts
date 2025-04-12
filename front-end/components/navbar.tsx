@@ -55,7 +55,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <div className="relative h-10 w-32">
-              <Image src="/images/kuriftu-logo.png" alt="Kuriftu Rewards" fill className="object-contain" />
+              <Image src="../images/download.jpeg" alt="Kuriftu Rewards" fill className="object-contain" />
+          
             </div>
             <span className={`ml-2 font-semibold ${isDashboard || isScrolled ? "text-amber-800" : "text-white"}`}>
               Rewards

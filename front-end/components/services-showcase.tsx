@@ -1,6 +1,7 @@
 import Image from "next/image"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SpadeIcon as Spa, Utensils, Waves, Dumbbell } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function ServicesShowcase() {
   const services = [
@@ -12,6 +13,7 @@ export default function ServicesShowcase() {
         "Our spa offers a sanctuary of relaxation with a range of treatments inspired by Ethiopian traditions and international techniques. Enjoy massages, facials, and body treatments in our serene environment.",
       features: ["Traditional massages", "Facial treatments", "Body scrubs", "Aromatherapy", "Couples packages"],
       image: "/placeholder.svg?height=400&width=600",
+      price: "From $80",
     },
     {
       id: "dining",
@@ -27,6 +29,7 @@ export default function ServicesShowcase() {
         "Wine selection",
       ],
       image: "/placeholder.svg?height=400&width=600",
+      price: "From $45",
     },
     {
       id: "activities",
@@ -36,6 +39,7 @@ export default function ServicesShowcase() {
         "Make the most of our stunning lakeside locations with various water activities. From kayaking to sunset boat tours, there's something for everyone to enjoy on our pristine waters.",
       features: ["Kayaking", "Boat tours", "Fishing", "Swimming", "Sunset cruises"],
       image: "/placeholder.svg?height=400&width=600",
+      price: "From $35",
     },
     {
       id: "fitness",
@@ -45,6 +49,7 @@ export default function ServicesShowcase() {
         "Stay active during your stay with our modern fitness facilities. Our centers are equipped with state-of-the-art equipment and offer personal training sessions upon request.",
       features: ["Modern equipment", "Personal trainers", "Yoga classes", "Outdoor activities", "Fitness programs"],
       image: "/placeholder.svg?height=400&width=600",
+      price: "From $25",
     },
   ]
 
@@ -93,6 +98,18 @@ export default function ServicesShowcase() {
                         </li>
                       ))}
                     </ul>
+                  </div>
+
+                  <div className="pt-4 flex items-center justify-between">
+                    <div className="text-lg font-medium text-amber-600">
+                      {service.price}
+                    </div>
+                    <Button 
+                      className="bg-amber-600 hover:bg-amber-700 text-white px-6"
+                      onClick={() => window.location.href = `/book/${service.id}`}
+                    >
+                      Book Now
+                    </Button>
                   </div>
                 </div>
                 <div className="relative h-[300px] rounded-lg overflow-hidden">
