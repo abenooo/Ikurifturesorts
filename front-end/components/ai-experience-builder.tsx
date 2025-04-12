@@ -164,7 +164,7 @@ export default function AiExperienceBuilder() {
                   <div className="flex justify-between items-center mb-2">
                     <h4 className="text-lg font-semibold">{generatedExperience.title}</h4>
                     <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded text-sm font-medium">
-                      {generatedExperience.points.toLocaleString()} pts
+                      {generatedExperience?.points?.toLocaleString() || '0'} pts
                     </span>
                   </div>
                   <p className="text-gray-600 text-sm">{generatedExperience.description}</p>

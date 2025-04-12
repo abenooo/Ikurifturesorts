@@ -113,12 +113,12 @@ export default function RedemptionModal({ isOpen, onClose, reward, userPoints, o
             <div className="flex justify-between items-center p-3 bg-amber-50 rounded-lg border border-amber-200 mb-6">
               <div>
                 <p className="text-sm text-gray-600">Reward Cost</p>
-                <p className="text-lg font-bold text-amber-600">{reward.points.toLocaleString()} points</p>
+                <p className="text-lg font-bold text-amber-600">{reward?.points?.toLocaleString() || '0'} points</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Your Balance</p>
                 <p className={`text-lg font-bold ${canRedeem ? "text-emerald-600" : "text-red-600"}`}>
-                  {userPoints.toLocaleString()} points
+                  {userPoints?.toLocaleString() || '0'} points
                 </p>
               </div>
             </div>
@@ -129,7 +129,7 @@ export default function RedemptionModal({ isOpen, onClose, reward, userPoints, o
                 <div>
                   <p className="text-sm font-medium text-red-800">Not Enough Points</p>
                   <p className="text-xs text-red-700">
-                    You need {(reward.points - userPoints).toLocaleString()} more points to redeem this reward.
+                    You need {((reward?.points || 0) - (userPoints || 0)).toLocaleString()} more points to redeem this reward.
                   </p>
                 </div>
               </div>

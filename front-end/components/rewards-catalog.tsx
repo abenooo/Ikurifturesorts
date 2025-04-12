@@ -180,7 +180,7 @@ export default function RewardsCatalog({ userPoints, onRedeemReward }: RewardsCa
           <div className="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-md border border-amber-200">
             <Gift className="h-4 w-4 text-amber-600" />
             <span className="text-sm font-medium">
-              Your Points: <span className="text-amber-600">{userPoints.toLocaleString()}</span>
+              Your Points: <span className="text-amber-600">{userPoints?.toLocaleString() || '0'}</span>
             </span>
           </div>
         </div>
@@ -328,7 +328,7 @@ function RewardCard({
         <h3 className="text-lg font-semibold mb-1">{reward.title}</h3>
         <p className="text-sm text-gray-600 mb-4">{reward.description}</p>
         <div className="flex justify-between items-center">
-          <span className="font-medium text-amber-600">{reward.points.toLocaleString()} points</span>
+          <span className="font-medium text-amber-600">{reward?.points?.toLocaleString() || '0'} points</span>
           <Button
             size="sm"
             disabled={!canRedeem}

@@ -199,7 +199,7 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Available Points</p>
-                    <p className="text-2xl font-bold text-amber-600">{userData.points.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-amber-600">{userData?.points?.toLocaleString() || '0'}</p>
                   </div>
                 </div>
 
@@ -233,7 +233,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle>Progress to {nextTier}</CardTitle>
               <CardDescription>
-                Earn {pointsToNextTier.toLocaleString()} more points to reach {nextTier} tier
+                Earn {pointsToNextTier?.toLocaleString() || '0'} more points to reach {nextTier} tier
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -242,7 +242,7 @@ export default function Dashboard() {
                 <div className="flex justify-between text-sm">
                   <span>{currentTier}</span>
                   <span>
-                    {userData.points.toLocaleString()} /{" "}
+                    {userData?.points?.toLocaleString() || '0'} /{" "}
                     {currentTier === "Bronze"
                       ? "1,000"
                       : currentTier === "Silver"
@@ -298,11 +298,11 @@ export default function Dashboard() {
                           >
                             {activity.type === "earned" ? (
                               <span className="flex items-center">
-                                <ArrowUpRight className="h-3 w-3 mr-1" />+{activity.amount.toLocaleString()} points
+                                <ArrowUpRight className="h-3 w-3 mr-1" />+{activity?.amount?.toLocaleString() || '0'} points
                               </span>
                             ) : (
                               <span className="flex items-center">
-                                <ArrowDownRight className="h-3 w-3 mr-1" />-{activity.amount.toLocaleString()} points
+                                <ArrowDownRight className="h-3 w-3 mr-1" />-{activity?.amount?.toLocaleString() || '0'} points
                               </span>
                             )}
                           </span>
@@ -357,18 +357,18 @@ export default function Dashboard() {
                   <p className="text-gray-600 mb-4">{recommendedExperience.description}</p>
                   <div className="flex justify-between items-center">
                     <span className="font-medium text-amber-600">
-                      {recommendedExperience.points.toLocaleString()} points
+                      {recommendedExperience?.points?.toLocaleString() || '0'} points
                     </span>
                     <Button
                       className="bg-amber-600 hover:bg-amber-700"
-                      disabled={userData.points < recommendedExperience.points}
+                      disabled={userData.points < (recommendedExperience?.points || 0)}
                       onClick={() => {
-                        if (userData.points >= recommendedExperience.points) {
+                        if (userData.points >= (recommendedExperience?.points || 0)) {
                           handleRedeemReward(recommendedExperience as Reward, () => {})
                         }
                       }}
                     >
-                      {userData.points >= recommendedExperience.points ? "Redeem Now" : "Not Enough Points"}
+                      {userData.points >= (recommendedExperience?.points || 0) ? "Redeem Now" : "Not Enough Points"}
                     </Button>
                   </div>
                 </CardContent>

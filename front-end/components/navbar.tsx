@@ -71,7 +71,7 @@ export default function Navbar() {
                 </Link>
                 <div className="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-md border border-amber-200">
                   <User className="h-4 w-4 text-amber-600" />
-                  <span className="text-sm font-medium text-gray-800">{userData.points.toLocaleString()} points</span>
+                  <span className="text-sm font-medium text-gray-800">{userData?.points?.toLocaleString() || '0'} points</span>
                 </div>
               </>
             ) : (
@@ -137,7 +137,7 @@ export default function Navbar() {
                   </Link>
                   <div className="flex items-center gap-2 bg-amber-50 px-3 py-2 rounded-md border border-amber-200">
                     <User className="h-4 w-4 text-amber-600" />
-                    <span className="text-sm font-medium text-gray-800">{userData.points.toLocaleString()} points</span>
+                    <span className="text-sm font-medium text-gray-800">{userData?.points?.toLocaleString() || '0'} points</span>
                   </div>
                 </>
               ) : (
