@@ -48,7 +48,8 @@ export default function BookingForm({ service, userPoints }: BookingFormProps) {
     }
 
     const bookingData: BookingFormData = {
-      date: selectedDate,
+      startDate: selectedDate,
+      endDate: selectedDate,
       time: selectedTime,
       guests,
       variant: selectedVariant,
@@ -84,7 +85,7 @@ export default function BookingForm({ service, userPoints }: BookingFormProps) {
         <label className="block text-sm font-medium text-gray-700">Date</label>
         <DatePicker
           selected={selectedDate}
-          onChange={(date: Date) => setSelectedDate(date)}
+          onChange={(date: Date | null) => setSelectedDate(date || new Date())}
           minDate={new Date()}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           placeholderText="Select date"

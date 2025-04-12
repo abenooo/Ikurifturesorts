@@ -13,7 +13,7 @@ export interface ServiceDetails {
   id: string
   title: string
   description: string
-  image?: string
+  images?: string[]
   duration: string
   basePrice: number
   maxGuests: number

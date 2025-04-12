@@ -12,7 +12,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="relative w-full h-[300px]">
         <Image
-          src={service.image || defaultImage}
+          src={service.images?.[0] || defaultImage}
           alt={service.title}
           fill
           className="object-cover"

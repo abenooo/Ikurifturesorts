@@ -14,7 +14,9 @@ const serviceVariants: ServiceVariant[] = [
     description: 'Access to all basic amenities and standard rooms',
     basePrice: 200,
     pointsPerGuest: 100,
-    maxGuests: 4
+    maxGuests: 4,
+    priceMultiplier: 1,
+    bonusPoints: 0
   },
   {
     id: 'premium',
@@ -22,7 +24,9 @@ const serviceVariants: ServiceVariant[] = [
     description: 'Premium rooms with additional services and VIP treatment',
     basePrice: 350,
     pointsPerGuest: 200,
-    maxGuests: 6
+    maxGuests: 6,
+    priceMultiplier: 1.5,
+    bonusPoints: 100
   },
   {
     id: 'luxury',
@@ -30,7 +34,9 @@ const serviceVariants: ServiceVariant[] = [
     description: 'Full luxury suite with all premium amenities and personal butler',
     basePrice: 500,
     pointsPerGuest: 300,
-    maxGuests: 8
+    maxGuests: 8,
+    priceMultiplier: 2,
+    bonusPoints: 200
   }
 ]
 
@@ -141,7 +147,7 @@ export default function BookingForm() {
             <label className="block text-sm font-medium text-gray-700">Date</label>
             <DatePicker
               selected={formData.date}
-              onChange={(date: Date) => setFormData(prev => ({ ...prev, date }))}
+              onChange={(date: Date | null) => setFormData(prev => ({ ...prev, date: date || new Date() }))}
               minDate={new Date()}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />

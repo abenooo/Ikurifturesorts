@@ -19,7 +19,9 @@ const DEFAULT_VARIANTS: ServiceVariant[] = [
     description: 'Regular booking',
     basePrice: 0, // Will be set based on service price
     pointsPerGuest: 100,
-    maxGuests: 4
+    maxGuests: 4,
+    priceMultiplier: 1,
+    bonusPoints: 0
   },
   {
     id: 'premium',
@@ -27,7 +29,9 @@ const DEFAULT_VARIANTS: ServiceVariant[] = [
     description: 'Enhanced experience with special perks',
     basePrice: 0, // Will be set based on service price
     pointsPerGuest: 200,
-    maxGuests: 6
+    maxGuests: 6,
+    priceMultiplier: 1.5,
+    bonusPoints: 100
   }
 ]
 
