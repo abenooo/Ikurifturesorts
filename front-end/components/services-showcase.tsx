@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Clock, Users, Star } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface Service {
   _id: string
@@ -23,6 +24,7 @@ interface Service {
 }
 
 export default function ServicesShowcase() {
+  const router = useRouter()
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -136,7 +138,7 @@ export default function ServicesShowcase() {
                 </div>
                 <Button 
                   className="w-full bg-amber-600 hover:bg-amber-700 text-white"
-                  onClick={() => window.location.href = `/book/${service._id}`}
+                  onClick={() => router.push(`/book/${service._id}`)}
                 >
                   Book Now
                 </Button>

@@ -157,7 +157,7 @@ export default function AuthModal({
     setIsLoggingIn(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/users/login`, {
+      const response = await fetch(`https://i-kuriftu.onrender.com/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },  
         body: JSON.stringify({
@@ -205,7 +205,7 @@ export default function AuthModal({
     setIsRegistering(true)
 
     try {
-      const response = await fetch('http://localhost:5000/api/users/register', {
+      const response = await fetch('https://i-kuriftu.onrender.com/api/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

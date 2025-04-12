@@ -1,43 +1,48 @@
-import Image from "next/image"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Clock, Users, Star } from "lucide-react"
-import { ServiceDetails } from "@/types/booking"
+import { ServiceDetails } from '@/types/booking'
+import Image from 'next/image'
 
 interface ServiceCardProps {
   service: ServiceDetails
 }
 
 export function ServiceCard({ service }: ServiceCardProps) {
+  const defaultImage = '/images/placeholder-service.jpg' // Fallback image
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{service.title}</CardTitle>
-        <CardDescription>{service.description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="relative h-[200px] mb-4 rounded-lg overflow-hidden">
-          <Image
-            src={service.image}
-            alt={service.title}
-            fill
-            className="object-cover"
-          />
+    <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="relative w-full h-[300px]">
+        <Image
+          src={service.image || defaultImage}
+          alt={service.title}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority
+        />
+      </div>
+      <div className="p-6">
+        <h2 className="text-2xl font-bold text-gray-900">{service.title}</h2>
+        <p className="mt-2 text-gray-600">{service.description}</p>
+        
+        <div className="mt-4 space-y-2">
+          <div className="flex items-center text-sm text-gray-500">
+            <span className="font-medium">Duration:</span>
+            <span className="ml-2">{service.duration}</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-500">
+            <span className="font-medium">Max Guests:</span>
+            <span className="ml-2">{service.maxGuests}</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-500">
+            <span className="font-medium">Base Price:</span>
+            <span className="ml-2">${service.basePrice}</span>
+          </div>
+          <div className="flex items-center text-sm text-green-600">
+            <span className="font-medium">Reward Points:</span>
+            <span className="ml-2">{service.rewardPoints} points</span>
+          </div>
         </div>
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-amber-600" />
-            <span className="text-sm">{service.duration}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-amber-600" />
-            <span className="text-sm">Max {service.maxGuests}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Star className="h-4 w-4 text-amber-600" />
-            <span className="text-sm">+{service.rewardPoints} pts</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 } 
