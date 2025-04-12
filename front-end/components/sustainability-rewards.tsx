@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Leaf, Droplets, Recycle, Sun, AlertCircle, CheckCircle2, CloudCog } from "lucide-react"
+import { Leaf, Droplets, Recycle, Sun, AlertCircle, CheckCircle2, CloudCog, Loader2 } from "lucide-react"
 import { useUserStore } from "@/store/userStore"
 import { toast } from "sonner"
 
@@ -30,6 +30,7 @@ export default function SustainabilityRewards() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [ecoActions, setEcoActions] = useState<EcoAction[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const { user, token } = useUserStore()
 
   useEffect(() => {
@@ -105,6 +106,7 @@ export default function SustainabilityRewards() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       let totalPointsEarned = 0;
       // Submit all selected actions
@@ -141,6 +143,8 @@ export default function SustainabilityRewards() {
     } catch (error) {
       console.error("Error submitting green actions:", error);
       toast.error("Failed to submit green actions");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -235,8 +239,16 @@ export default function SustainabilityRewards() {
               <Button 
                 onClick={handleLinkStay} 
                 className="bg-emerald-600 hover:bg-emerald-700"
+                disabled={isSubmitting}
               >
-                Link Selected Actions ({selectedActions.length})
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Linking Actions...
+                  </>
+                ) : (
+                  `Link Selected Actions (${selectedActions.length})`
+                )}
               </Button>
             ) : isAuthenticated ? (
               <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
