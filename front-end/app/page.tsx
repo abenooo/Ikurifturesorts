@@ -6,6 +6,7 @@ import { ArrowRight, Play } from "lucide-react"
 import MembershipTiers from "@/components/membership-tiers"
 import AiExperienceBuilder from "@/components/ai-experience-builder"
 import SustainabilityRewards from "@/components/sustainability-rewards"
+import  ServicesShowcase from "@/components/services-showcase"
 import WaitlistForm from "@/components/waitlist-form"
 import AuthModal from "@/components/auth-modal"
 
@@ -91,7 +92,7 @@ export default function Home() {
           <MembershipTiers />
         </div>
       </section>
-
+ 
       {/* AI Experience Builder Section */}
       <section id="ai-experience" className="py-20 bg-white">
         <div className="container px-4 md:px-6 mx-auto">
@@ -100,6 +101,13 @@ export default function Home() {
             Tell us what you love, and our AI will craft the perfect reward experience just for you.
           </p>
           <AiExperienceBuilder />
+        </div>
+      </section>
+      {/* Service Tiers Section */}
+ <section id="services" className="py-20 bg-stone-100">
+        <div className="container px-4 md:px-6 mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Services</h2>
+          <ServicesShowcase />
         </div>
       </section>
 

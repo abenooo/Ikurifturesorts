@@ -83,6 +83,12 @@ export default function Navbar() {
                   Membership Tiers
                 </Link>
                 <Link
+                  href="#services"
+                  className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}
+                >
+                  Services
+                </Link>
+                <Link
                   href="#ai-experience"
                   className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}
                 >
@@ -142,6 +148,13 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Membership Tiers
+                  </Link>
+                  <Link
+                    href="#services"
+                    className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Services
                   </Link>
                   <Link
                     href="#ai-experience"
