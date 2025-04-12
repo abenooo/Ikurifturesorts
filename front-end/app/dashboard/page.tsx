@@ -264,11 +264,6 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Ways to Earn */}
-        <div className="mb-8">
-          <WaysToEarn onEarnPoints={handleEarnPoints} />
-        </div>
-
         {/* Dashboard Tabs */}
         <Tabs defaultValue="rewards" className="mb-8">
           <TabsList className="grid grid-cols-2 md:w-[400px] mb-6">

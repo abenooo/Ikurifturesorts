@@ -11,14 +11,29 @@ import WaitlistForm from "@/components/waitlist-form"
 import AuthModal from "@/components/auth-modal"
 import { useUserStore } from "@/store/userStore"
 import type { UserData } from "@/store/userStore"
-
+import { useRouter } from "next/navigation"
+import WaysToEarn from "@/components/ways-to-earn"
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const router = useRouter()
   const { user, token,setUser  } = useUserStore()
   const handleLogin = (userData: any) => {
     // Store user data in localStorage for persistence
     localStorage.setItem("kuriftuUser", JSON.stringify(userData))
     setUser(userData, token)
+  }
+
+  const handleEarnPoints = (amount: number, description: string) => {
+    // Check if user is logged in
+    const storedUser = localStorage.getItem("kuriftuUser")
+    if (!storedUser) {
+      // If not logged in, open auth modal
+      setIsAuthModalOpen(true)
+      return
+    }
+
+    // If logged in, navigate to dashboard
+    router.push("/dashboard")
   }
 
   return (
@@ -80,47 +95,59 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Membership Tiers Section */}
-      <section id="membership-tiers" className="py-20 bg-stone-100">
+      {/* Service Tiers Section */}
+      <section id="services" className="py-16 bg-stone-100">
         <div className="container px-4 md:px-6 mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Membership Tiers</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">Services</h2>
+          <ServicesShowcase />
+        </div>
+      </section>
+
+      {/* Membership Tiers Section */}
+      <section id="membership-tiers" className="py-16 bg-white">
+        <div className="container px-4 md:px-6 mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">Membership Tiers</h2>
           <MembershipTiers />
         </div>
       </section>
- 
+
       {/* AI Experience Builder Section */}
-      <section id="ai-experience" className="py-20 bg-white">
+      <section id="ai-experience" className="py-16 bg-stone-100">
         <div className="container px-4 md:px-6 mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">AI Experience Builder</h2>
-          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
             Tell us what you love, and our AI will craft the perfect reward experience just for you.
           </p>
           <AiExperienceBuilder />
         </div>
       </section>
-      {/* Service Tiers Section */}
- <section id="services" className="py-20 bg-stone-100">
-        <div className="container px-4 md:px-6 mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">Services</h2>
-          <ServicesShowcase />
-        </div>
-      </section>
 
       {/* Sustainability Rewards Section */}
-      <section id="sustainability" className="py-20 bg-emerald-50">
+      <section id="sustainability" className="py-16 bg-emerald-50">
         <div className="container px-4 md:px-6 mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Sustainability Rewards</h2>
-          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
             Make eco-friendly choices during your stay and earn Green Points towards meaningful rewards.
           </p>
           <SustainabilityRewards />
         </div>
       </section>
 
-      {/* Footer & Waitlist Section */}
-      <section id="join-now" className="py-20 bg-stone-900 text-white">
+      {/* Ways to Earn Section */}
+      <section id="ways-to-earn" className="py-16 bg-white">
         <div className="container px-4 md:px-6 mx-auto">
-          <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Ways to Earn Points</h2>
+          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+            Discover all the ways you can earn points and unlock amazing rewards at Kuriftu Resorts.
+          </p>
+          <WaysToEarn onEarnPoints={handleEarnPoints} />
+        </div>
+      </section>
+
+      {/* Footer & Waitlist Section */}
+      <section id="join-now" className="py-16 bg-stone-900 text-white">
+        <div className="container px-4 md:px-6 mx-auto">
+          <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Stays?</h2>
             <p className="text-xl text-stone-300 max-w-2xl mx-auto">
               Join our waitlist to be the first to experience Kuriftu's revolutionary loyalty program.
@@ -131,7 +158,7 @@ export default function Home() {
             <WaitlistForm />
           </div>
 
-          <div className="mt-16 text-center text-stone-400">
+          <div className="mt-12 text-center text-stone-400">
             <p>Hackathon prototype. Coming 2025!</p>
             <p className="mt-4">© 2025 Kuriftu Resorts. All rights reserved.</p>
           </div>
