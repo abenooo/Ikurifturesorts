@@ -26,6 +26,9 @@ const createBooking = async (req, res) => {
     const discount = basePrice * membershipDiscount[user.membershipTier];
     const totalPrice = basePrice - discount;
 
+    // Calculate points earned
+    const pointsEarned = user.calculatePointsFromService(totalPrice);
+
     // Create booking
     const booking = new Booking({
       user: req.user._id,
@@ -33,6 +36,7 @@ const createBooking = async (req, res) => {
       date,
       numberOfGuests,
       totalPrice,
+      pointsEarned,
       specialRequests,
       paymentMethod
     });
@@ -41,10 +45,14 @@ const createBooking = async (req, res) => {
 
     // Update user's bookings and loyalty points
     user.bookings.push(booking._id);
-    user.addLoyaltyPoints(totalPrice);
+    await user.addLoyaltyPoints(pointsEarned);
     await user.save();
 
-    res.status(201).json(booking);
+    res.status(201).json({
+      booking,
+      pointsEarned,
+      message: `Booking successful! You earned ${pointsEarned} loyalty points.`
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error creating booking', error: error.message });
   }
@@ -103,7 +111,7 @@ const cancelBooking = async (req, res) => {
     booking.status = 'Cancelled';
     await booking.save();
 
-    // Update user's loyalty points if payment was made
+    // Deduct points if booking was paid
     if (booking.paymentStatus === 'Paid') {
       const user = await User.findById(req.user._id);
       user.loyaltyPoints -= booking.pointsEarned;

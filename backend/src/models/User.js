@@ -19,14 +19,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  loyaltyPoints: {
+    type: Number,
+    default: 1000 // Increased from 100 to 1000 for registration bonus
+  },
   membershipTier: {
     type: String,
     enum: ['Bronze', 'Silver', 'Gold', 'Platinum'],
     default: 'Bronze'
-  },
-  loyaltyPoints: {
-    type: Number,
-    default: 0
   },
   totalSpent: {
     type: Number,
@@ -48,7 +48,12 @@ const userSchema = new mongoose.Schema({
   rewards: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Reward'
-  }]
+  }],
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  }
 }, {
   timestamps: true
 });
@@ -85,10 +90,31 @@ userSchema.methods.updateMembershipTier = function() {
 };
 
 // Method to add loyalty points
-userSchema.methods.addLoyaltyPoints = function(amount) {
-  this.loyaltyPoints += amount;
-  this.totalSpent += amount;
-  this.updateMembershipTier();
+userSchema.methods.addLoyaltyPoints = async function(points) {
+  this.loyaltyPoints += points;
+  
+  // Update membership tier based on points
+  if (this.loyaltyPoints >= 10000) {
+    this.membershipTier = 'Platinum';
+  } else if (this.loyaltyPoints >= 5000) {
+    this.membershipTier = 'Gold';
+  } else if (this.loyaltyPoints >= 2000) {
+    this.membershipTier = 'Silver';
+  }
+  
+  await this.save();
+};
+
+// Calculate points from service price
+userSchema.methods.calculatePointsFromService = function(servicePrice) {
+  const pointsMultiplier = {
+    Bronze: 10,
+    Silver: 12,
+    Gold: 15,
+    Platinum: 20
+  };
+  
+  return Math.floor(servicePrice * pointsMultiplier[this.membershipTier]);
 };
 
 module.exports = mongoose.model('User', userSchema); 
