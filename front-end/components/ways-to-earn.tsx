@@ -12,7 +12,7 @@ interface WaysToEarnProps {
   onEarnPoints: (amount: number, description: string) => void
 }
 
-export default function WaysToEarn({ onEarnPoints }: WaysToEarnProps) {
+export default function   WaysToEarn({ onEarnPoints }: WaysToEarnProps) {
   return (
     <Card>
       <CardHeader>

@@ -25,7 +25,7 @@ export default function Navbar() {
   const [userData, setUserData] = useState<UserData | null>(null)
   const { user, token, setUser, clearUser } = useUserStore()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  // const storedUser = localStorage.getItem("kuriftuUser")
+  // const {user:userProfile} = user;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,7 +77,7 @@ export default function Navbar() {
     localStorage.setItem("kuriftuUser", JSON.stringify(userData))
     setUser(userData, token)
   }
-
+ console.log("uuuuuuuuusssserrrrr",user);
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navbarBg}`}>
       <div className="container mx-auto px-4 md:px-6">
@@ -131,7 +131,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-md border border-amber-200">
                     <User className="h-4 w-4 text-amber-600" />
-                    <span className="text-sm font-medium text-gray-800">{userData?.points?.toLocaleString() || '0'} points</span>
+                    <span className="text-sm font-medium text-gray-800">{user.loyaltyPoints?.toLocaleString() || '0'} points</span>
                   </div>
                   <Button variant="outline" onClick={handleLogout} className="h-8">
                     Logout

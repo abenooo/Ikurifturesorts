@@ -10,7 +10,7 @@ interface RedemptionModalProps {
   isOpen: boolean
   onClose: () => void
   reward: Reward
-  userPoints: number
+  userPoints: number | undefined
   onConfirm: () => void
 }
 
@@ -38,7 +38,7 @@ export default function RedemptionModal({ isOpen, onClose, reward, userPoints, o
     }, 1500)
   }
 
-  const canRedeem = userPoints >= reward.points
+  const canRedeem = (userPoints ?? 0) >= reward.points
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

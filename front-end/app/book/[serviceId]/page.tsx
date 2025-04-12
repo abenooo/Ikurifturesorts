@@ -8,7 +8,7 @@ import { ServiceCard } from "@/components/booking/service-card"
 import { BookingForm } from "@/components/booking/booking-form"
 import { ServiceDetails } from "@/types/booking"
 
-const API_URL = 'https://i-kuriftu.onrender.com'
+const API_URL = 'http://localhost:5000'
 
 export default function BookingPage() {
   const params = useParams()

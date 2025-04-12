@@ -12,6 +12,8 @@ const Activity = require('../models/Activity');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Booking = require('../models/Booking');
+const Redemption = require('../models/Redemption');
 
 // Public routes
 router.post('/register', async (req, res) => {
@@ -166,6 +168,32 @@ router.post('/activities', auth, async (req, res) => {
   } catch (error) {
     console.error('Error creating activity:', error);
     res.status(500).json({ message: 'Error creating activity' });
+  }
+});
+
+// Get user's bookings
+router.get('/bookings', auth, async (req, res) => {
+  try {
+    const bookings = await Booking.find({ user: req.user._id })
+      .sort({ date: -1 })
+      .limit(50);
+    res.json({ bookings });
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    res.status(500).json({ message: 'Error fetching bookings' });
+  }
+});
+
+// Get user's redemptions
+router.get('/redemptions', auth, async (req, res) => {
+  try {
+    const redemptions = await Redemption.find({ user: req.user._id })
+      .sort({ date: -1 })
+      .limit(50);
+    res.json({ redemptions });
+  } catch (error) {
+    console.error('Error fetching redemptions:', error);
+    res.status(500).json({ message: 'Error fetching redemptions' });
   }
 });
 

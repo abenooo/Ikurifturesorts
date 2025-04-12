@@ -6,9 +6,18 @@ export interface UserData {
   firstName: string
   lastName: string
   email: string
-  points?: number
-  tier?: string
-  joinDate?: string
+  loyaltyPoints: number
+  membershipTier: string
+  totalSpent: number
+  membershipSince: string
+  preferences: {
+    language: string
+    currency: string
+    notifications: boolean
+  }
+  bookings: any[]
+  rewards: any[]
+  role: string
 }
 
 interface UserState {
