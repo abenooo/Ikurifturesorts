@@ -10,7 +10,6 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Gift, Award, Calendar, ChevronRight, Leaf, Sparkles, ArrowUpRight, ArrowDownRight } from "lucide-react"
 import RewardsCatalog, { type Reward } from "@/components/rewards-catalog"
-import WaysToEarn from "@/components/ways-to-earn"
 
 interface PointActivity {
   id: string
@@ -258,11 +257,6 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         )}
-
-        {/* Ways to Earn */}
-        <div className="mb-8">
-          <WaysToEarn onEarnPoints={handleEarnPoints} />
-        </div>
 
         {/* Dashboard Tabs */}
         <Tabs defaultValue="rewards" className="mb-8">

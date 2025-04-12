@@ -9,6 +9,8 @@ import SustainabilityRewards from "@/components/sustainability-rewards"
 import  ServicesShowcase from "@/components/services-showcase"
 import WaitlistForm from "@/components/waitlist-form"
 import AuthModal from "@/components/auth-modal"
+import WaysToEarn from "@/components/ways-to-earn"
+import { useRouter } from "next/navigation"
 
 interface UserData {
   name: string
@@ -20,10 +22,24 @@ interface UserData {
 
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const router = useRouter()
 
   const handleLogin = (userData: UserData) => {
     // Store user data in localStorage for persistence
     localStorage.setItem("kuriftuUser", JSON.stringify(userData))
+  }
+
+  const handleEarnPoints = (amount: number, description: string) => {
+    // Check if user is logged in
+    const storedUser = localStorage.getItem("kuriftuUser")
+    if (!storedUser) {
+      // If not logged in, open auth modal
+      setIsAuthModalOpen(true)
+      return
+    }
+
+    // If logged in, navigate to dashboard
+    router.push("/dashboard")
   }
 
   return (
@@ -119,6 +135,17 @@ export default function Home() {
             Make eco-friendly choices during your stay and earn Green Points towards meaningful rewards.
           </p>
           <SustainabilityRewards />
+        </div>
+      </section>
+
+      {/* Ways to Earn Section */}
+      <section id="ways-to-earn" className="py-20 bg-white">
+        <div className="container px-4 md:px-6 mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">Ways to Earn Points</h2>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Discover all the ways you can earn points and unlock amazing rewards at Kuriftu Resorts.
+          </p>
+          <WaysToEarn onEarnPoints={handleEarnPoints} />
         </div>
       </section>
 
