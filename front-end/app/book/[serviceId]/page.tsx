@@ -18,13 +18,15 @@ export default function BookingPage() {
   const [userPoints, setUserPoints] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const {user} = useUserStore()
+  const [userData, setUserData] = useState<any>(null)
+
+  const { user, token, setUser, clearUser } = useUserStore()
 
   useEffect(() => {
     const fetchService = async () => {
       try {
         const serviceId = params.serviceId as string
-        const response = await fetch(`${API_URL}/api/services/${serviceId}`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/services/${serviceId}`)
         if (!response.ok) {
           throw new Error('Failed to fetch service details')
         }
@@ -55,9 +57,26 @@ export default function BookingPage() {
         setService(transformedService)
 
         // Fetch user points from localStorage
+        const storedUser = localStorage.getItem("kuriftuUser")
+        if (storedUser) {
+          try {
+            const parsedUser = JSON.parse(storedUser)
+            setUserData(parsedUser)
+            // Access the nested user object
+            const actualUser = parsedUser.state?.user?.user || parsedUser.user || parsedUser
+            const actualToken = parsedUser.state?.user?.token || parsedUser.token
+            console.log(actualUser)
+            if (actualUser) {
+              setUser(actualUser, actualToken)
+            }
+          } catch (e) {
+            console.error("Failed to parse user data", e)
+          }
+        }
         // const userData = localStorage.getItem('kuriftuUser')
         // if (userData) {
         //   const { points } = JSON.parse(userData)
+        //   console.log(points)
         //   setUserPoints(points || 0)
         // }
       } catch (err) {
