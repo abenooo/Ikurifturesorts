@@ -5,6 +5,7 @@ const authMiddleware = async (req, res, next) => {
   try {
     // Get token from header
     const authHeader = req.header('Authorization');
+    console.log('afdfdsfdsfdsaf',authHeader)
     
     if (!authHeader) {
       return res.status(401).json({ 
@@ -27,9 +28,10 @@ const authMiddleware = async (req, res, next) => {
     try {
       // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log('uuuuuuuu',decoded)
       
       // Find user by ID
-      const user = await User.findById(decoded.userId);
+      const user = await User.findById(decoded.id);
       if (!user) {
         return res.status(401).json({ 
           message: 'User not found or deleted',
