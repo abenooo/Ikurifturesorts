@@ -20,7 +20,7 @@ import { ServiceDetails, ServiceVariant } from "@/types/booking"
 
 interface BookingFormProps {
   service: ServiceDetails
-  userPoints: number
+  userPoints: number | undefined
 }
 
 const DEFAULT_VARIANT: ServiceVariant = {
@@ -110,7 +110,7 @@ export function BookingForm({ service, userPoints }: BookingFormProps) {
   const handlePointsChange = (use: boolean) => {
     setUsePoints(use)
     if (use) {
-      const maxAllowed = Math.min(userPoints, calculateMaxPointsDiscount())
+      const maxAllowed = Math.min(userPoints as number, calculateMaxPointsDiscount())
       setPointsToUse(maxAllowed > 0 ? maxAllowed : 0)
     } else {
       setPointsToUse(0)
@@ -120,7 +120,7 @@ export function BookingForm({ service, userPoints }: BookingFormProps) {
   // Update points to use when base total changes
   useEffect(() => {
     if (usePoints) {
-      const maxAllowed = Math.min(userPoints, calculateMaxPointsDiscount())
+      const maxAllowed = Math.min(userPoints as number, calculateMaxPointsDiscount())
       setPointsToUse(prev => Math.min(prev, maxAllowed))
     }
   }, [calculateBaseTotal(), usePoints, userPoints])
@@ -260,10 +260,10 @@ export function BookingForm({ service, userPoints }: BookingFormProps) {
           usePoints={usePoints}
           setUsePoints={handlePointsChange}
           earnedPoints={calculateRewardPoints()}
-          userPoints={userPoints}
+          userPoints={userPoints as number}
           membershipTier={membershipTier}
           pointsToUse={pointsToUse}
-          maxPointsToUse={Math.min(userPoints, calculateMaxPointsDiscount())}
+          maxPointsToUse={Math.min(userPoints as number, calculateMaxPointsDiscount())}
           onPointsChange={setPointsToUse}
         />
 

@@ -1,22 +1,29 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { ArrowRight, Play } from "lucide-react"
 import MembershipTiers from "@/components/membership-tiers"
 import AiExperienceBuilder from "@/components/ai-experience-builder"
 import SustainabilityRewards from "@/components/sustainability-rewards"
-import  ServicesShowcase from "@/components/services-showcase"
+import ServicesShowcase from "@/components/services-showcase"
 import WaitlistForm from "@/components/waitlist-form"
 import AuthModal from "@/components/auth-modal"
-import { useUserStore } from "@/store/userStore"
+import { useUserStore, rehydrateStore } from "@/store/userStore"
 import type { UserData } from "@/store/userStore"
 import { useRouter } from "next/navigation"
 import WaysToEarn from "@/components/ways-to-earn"
+
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const router = useRouter()
-  const { user, token,setUser  } = useUserStore()
+  const { user, token, setUser } = useUserStore()
+
+  useEffect(() => {
+    // Rehydrate store on mount
+    rehydrateStore()
+  }, [])
+
   const handleLogin = (userData: any) => {
     // Store user data in localStorage for persistence
     console.log('---------------',userData)
@@ -25,15 +32,10 @@ export default function Home() {
   }
 
   const handleEarnPoints = (amount: number, description: string) => {
-    // Check if user is logged in
-    const storedUser = localStorage.getItem("kuriftuUser")
-    if (!storedUser) {
-      // If not logged in, open auth modal
+    if (!user) {
       setIsAuthModalOpen(true)
       return
     }
-
-    // If logged in, navigate to dashboard
     router.push("/dashboard")
   }
 

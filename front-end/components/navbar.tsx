@@ -6,7 +6,7 @@ import Image from "next/image"
 import { useRouter, usePathname } from "next/navigation"
 import { Menu, X, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useUserStore } from "@/store/userStore"
+import { useUserStore, rehydrateStore } from "@/store/userStore"
 import AuthModal from "./auth-modal"
 
 export default function Navbar() {
@@ -14,9 +14,8 @@ export default function Navbar() {
   const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [userData, setUserData] = useState<any>(null)
-  const { user, token, setUser, clearUser } = useUserStore()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const { user, token, setUser, clearUser } = useUserStore()
   
   const navbarBg = isScrolled ? "bg-white shadow-md" : "bg-transparent"
   const textColor = isScrolled ? "text-gray-800" : "text-white"
@@ -27,46 +26,18 @@ export default function Navbar() {
       setIsScrolled(window.scrollY > 10)
     }
 
-    // Hydrate user from localStorage if exists
-    const storedUser = localStorage.getItem("kuriftuUser")
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser)
-        setUserData(parsedUser)
-        // Access the nested user object
-        const actualUser = parsedUser.state?.user?.user || parsedUser.user || parsedUser
-        const actualToken = parsedUser.state?.user?.token || parsedUser.token
-        if (actualUser) {
-          setUser(actualUser, actualToken)
-        }
-      } catch (e) {
-        console.error("Failed to parse user data", e)
-      }
-    }
+    // Rehydrate store on mount
+    rehydrateStore()
 
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [setUser])
+  }, [])
 
   const handleLogin = (userData: any) => {
-    // Normalize the structure before saving
-    const userToStore = {
-      state: {
-        user: {
-          user: userData.user || userData,
-          token: userData.token
-        },
-        token: userData.token,
-        isHydrated: true
-      },
-      version: 0
-    }
-    localStorage.setItem("kuriftuUser", JSON.stringify(userToStore))
     setUser(userData.user || userData, userData.token)
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("kuriftuUser")
     clearUser()
     router.push("/")
   }

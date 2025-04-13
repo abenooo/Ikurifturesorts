@@ -28,35 +28,58 @@ interface UserState {
   isHydrated: boolean
 }
 
-// Initialize from localStorage if available
-const getInitialState = () => {
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem('kuriftuUser')
-    if (stored) {
-      const { user, token } = JSON.parse(stored)
-      return { user, token }
-    }
-  }
-  return { user: null, token: null }
-}
-
-const initialState = getInitialState()
-
 export const useUserStore = create<UserState>()(
   persist(
-    (set) => ({
-      user: initialState.user,
-      token: initialState.token,
+    (set, get) => ({
+      user: null,
+      token: null,
       isHydrated: false,
-      setUser: (user, token) => set({ user, token }),
-      clearUser: () => set({ user: null, token: null }),
+      setUser: (user, token) => {
+        set({ user, token, isHydrated: true })
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kuriftuUser', JSON.stringify({ user, token }))
+        }
+      },
+      clearUser: () => {
+        set({ user: null, token: null, isHydrated: true })
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('kuriftuUser')
+        }
+      },
     }),
     {
       name: 'kuriftuUser',
       storage: createJSONStorage(() => localStorage),
       onRehydrateStorage: () => (state) => {
-        state?.setUser(state.user, state.token)
-      }
+        if (state) {
+          state.isHydrated = true
+        }
+      },
+      partialize: (state) => ({
+        user: state.user,
+        token: state.token,
+      }),
     }
   )
-) 
+)
+
+// Helper function to check if store is hydrated
+export const isStoreHydrated = () => {
+  return useUserStore.getState().isHydrated
+}
+
+// Helper function to manually rehydrate the store
+export const rehydrateStore = () => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem('kuriftuUser')
+    if (stored) {
+      try {
+        const { user, token } = JSON.parse(stored)
+        useUserStore.getState().setUser(user, token)
+      } catch (error) {
+        console.error('Error rehydrating store:', error)
+        localStorage.removeItem('kuriftuUser')
+      }
+    }
+  }
+} 

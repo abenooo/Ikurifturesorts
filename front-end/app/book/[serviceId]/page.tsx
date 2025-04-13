@@ -7,6 +7,7 @@ import { ArrowLeft, Loader2 } from "lucide-react"
 import { ServiceCard } from "@/components/booking/service-card"
 import { BookingForm } from "@/components/booking/booking-form"
 import { ServiceDetails } from "@/types/booking"
+import { useUserStore } from '@/store/userStore'
 
 const API_URL = 'http://localhost:5000'
 
@@ -17,6 +18,7 @@ export default function BookingPage() {
   const [userPoints, setUserPoints] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const {user} = useUserStore()
 
   useEffect(() => {
     const fetchService = async () => {
@@ -53,11 +55,11 @@ export default function BookingPage() {
         setService(transformedService)
 
         // Fetch user points from localStorage
-        const userData = localStorage.getItem('kuriftuUser')
-        if (userData) {
-          const { points } = JSON.parse(userData)
-          setUserPoints(points || 0)
-        }
+        // const userData = localStorage.getItem('kuriftuUser')
+        // if (userData) {
+        //   const { points } = JSON.parse(userData)
+        //   setUserPoints(points || 0)
+        // }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred')
       } finally {
@@ -120,7 +122,7 @@ export default function BookingPage() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <ServiceCard service={service} />
-          <BookingForm service={service} userPoints={userPoints} />
+          <BookingForm service={service} userPoints={user?.loyaltyPoints} />
         </div>
       </div>
     </div>
