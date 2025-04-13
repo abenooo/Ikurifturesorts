@@ -7,24 +7,60 @@ const bookingSchema = new mongoose.Schema({
     required: true
   },
   service: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Service',
+    required: true
+  },
+  variant: {
     type: String,
     required: true
   },
-  date: {
+  startDate: {
     type: Date,
     required: true
   },
-  status: {
-    type: String,
-    enum: ['upcoming', 'completed', 'cancelled'],
-    default: 'upcoming'
+  endDate: {
+    type: Date,
+    required: true
   },
-  pointsEarned: {
+  time: {
+    type: String,
+    required: true
+  },
+  guests: {
+    type: Number,
+    required: true,
+    min: 1
+  },
+  totalPrice: {
     type: Number,
     required: true
+  },
+  totalPoints: {
+    type: Number,
+    default: 0
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'confirmed', 'cancelled', 'completed'],
+    default: 'pending'
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'paid', 'refunded'],
+    default: 'pending'
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
-}, {
-  timestamps: true
 });
 
-module.exports = mongoose.model('Booking', bookingSchema); 
+// Add indexes for better query performance
+bookingSchema.index({ user: 1, createdAt: -1 });
+bookingSchema.index({ service: 1, startDate: 1 });
+bookingSchema.index({ status: 1 });
+
+const Booking = mongoose.model('Booking', bookingSchema);
+
+module.exports = Booking; 

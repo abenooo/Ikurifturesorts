@@ -37,6 +37,7 @@ const DEFAULT_VARIANT: ServiceVariant = {
 export function BookingForm({ service, userPoints }: BookingFormProps) {
   const router = useRouter()
   const [userData, setUserData] = useState<any>(null)
+  console.log('sssssss',service)
   
   // Load user data from localStorage
   useEffect(() => {

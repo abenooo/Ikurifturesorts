@@ -5,47 +5,66 @@ const User = require('../models/User');
 // Create a new booking
 const createBooking = async (req, res) => {
   try {
-    const { serviceId, date, numberOfGuests, specialRequests, paymentMethod } = req.body;
-    
+    const { 
+      serviceId, 
+      variant,
+      startDate, 
+      endDate,
+      time,
+      guests,
+      totalPrice,
+      totalPoints
+    } = req.body;
+
+    // Validate required fields
+    if (!serviceId || !variant || !startDate || !endDate || !time || !guests || !totalPrice) {
+      return res.status(400).json({ 
+        message: 'Missing required fields',
+        required: ['serviceId', 'variant', 'startDate', 'endDate', 'time', 'guests', 'totalPrice']
+      });
+    }
+
     // Get service details
     const service = await Service.findById(serviceId);
     if (!service) {
       return res.status(404).json({ message: 'Service not found' });
     }
 
-    // Calculate total price based on membership tier
+    // Get user details
     const user = await User.findById(req.user._id);
-    const basePrice = service.price * numberOfGuests;
-    const membershipDiscount = {
-      Bronze: 0,
-      Silver: 0.1,
-      Gold: 0.15,
-      Platinum: 0.2
-    };
-    
-    const discount = basePrice * membershipDiscount[user.membershipTier];
-    const totalPrice = basePrice - discount;
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    // Calculate points earned
-    const pointsEarned = user.calculatePointsFromService(totalPrice);
+    // Check if user has enough points if they're using points
+    if (totalPoints > 0 && user.loyaltyPoints < totalPoints) {
+      return res.status(400).json({ message: 'Insufficient points' });
+    }
 
     // Create booking
     const booking = new Booking({
       user: req.user._id,
       service: serviceId,
-      date,
-      numberOfGuests,
+      variant,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      time,
+      guests,
       totalPrice,
-      pointsEarned,
-      specialRequests,
-      paymentMethod
+      totalPoints
     });
 
     await booking.save();
 
-    // Update user's bookings and loyalty points
-    user.bookings.push(booking._id);
-    await user.addLoyaltyPoints(pointsEarned);
+    // Update user's points if points were used
+    if (totalPoints > 0) {
+      user.loyaltyPoints -= totalPoints;
+      await user.save();
+    }
+
+    // Calculate and add points earned from the booking
+    const pointsEarned = calculatePointsEarned(service, variant, guests, user.membershipTier);
+    user.loyaltyPoints += pointsEarned;
     await user.save();
 
     res.status(201).json({
@@ -54,8 +73,35 @@ const createBooking = async (req, res) => {
       message: `Booking successful! You earned ${pointsEarned} loyalty points.`
     });
   } catch (error) {
-    res.status(500).json({ message: 'Error creating booking', error: error.message });
+    console.error('Error creating booking:', error);
+    res.status(500).json({ 
+      message: 'Error creating booking', 
+      error: error.message 
+    });
   }
+};
+
+// Helper function to calculate points earned
+const calculatePointsEarned = (service, variant, guests, membershipTier) => {
+  // Base points from service
+  let points = service.rewardPoints || 0;
+
+  // Add points from variant if available
+  const selectedVariant = service.variants.find(v => v.name === variant);
+  if (selectedVariant) {
+    points += (selectedVariant.pointsPerGuest || 0) * guests;
+    points += selectedVariant.bonusPoints || 0;
+  }
+
+  // Apply membership tier multiplier
+  const tierMultipliers = {
+    'Bronze': 1,
+    'Silver': 1.2,
+    'Gold': 1.5,
+    'Platinum': 2
+  };
+
+  return Math.floor(points * (tierMultipliers[membershipTier] || 1));
 };
 
 // Get all bookings for a user

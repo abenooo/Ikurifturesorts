@@ -9,7 +9,6 @@ import { BookingForm } from "@/components/booking/booking-form"
 import { ServiceDetails } from "@/types/booking"
 import { useUserStore } from '@/store/userStore'
 
-const API_URL = 'http://localhost:5000'
 
 export default function BookingPage() {
   const params = useParams()
@@ -26,6 +25,7 @@ export default function BookingPage() {
     const fetchService = async () => {
       try {
         const serviceId = params.serviceId as string
+        console.log('sssssrrrrr',)
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/services/${serviceId}`)
         if (!response.ok) {
           throw new Error('Failed to fetch service details')
@@ -39,7 +39,7 @@ export default function BookingPage() {
           description: data.description,
           images: data.images,
           duration: data.duration,
-          basePrice: data.basePrice,
+          basePrice: data.price,
           maxGuests: data.maxGuests,
           rewardPoints: data.rewardPoints,
           variants: data.variants?.map((variant: any) => ({
