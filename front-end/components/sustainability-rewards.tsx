@@ -39,13 +39,13 @@ export default function SustainabilityRewards() {
       console.log('tttttttttttt',token)
       try {
         const [actionsResponse, pointsResponse] = await Promise.all([
-          fetch("https://i-kuriftu.onrender.com/api/green-points/actions", {
+          fetch("http://localhost:5003/api/green-points/actions", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json"
             }
           }),
-          fetch("https://i-kuriftu.onrender.com/api/green-points/my-points", {
+          fetch("http://localhost:5003/api/green-points/my-points", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json"
@@ -114,7 +114,7 @@ export default function SustainabilityRewards() {
         const action = ecoActions.find((a) => a.id === actionId);
         if (!action) continue;
 
-        const response = await fetch("https://i-kuriftu.onrender.com/api/green-points/submit", {
+        const response = await fetch("http://localhost:5003/api/green-points/submit", {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

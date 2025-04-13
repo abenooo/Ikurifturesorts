@@ -154,7 +154,7 @@ export function BookingForm({ service, userPoints }: BookingFormProps) {
         totalPoints: calculateRewardPoints(),
       }
 
-      const response = await fetch(`https://i-kuriftu.onrender.com/api/bookings`, {
+      const response = await fetch(`http://localhost:5003/api/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

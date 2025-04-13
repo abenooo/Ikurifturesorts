@@ -79,7 +79,7 @@ export default function Dashboard() {
       if (!token) return;
       
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/users/activities",
+        "http://localhost:5003/api/users/activities",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -110,7 +110,7 @@ export default function Dashboard() {
 
     try {
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/users/activities",
+        "http://localhost3/api/users/activities",
         {
           method: 'POST',
           headers: {
@@ -142,7 +142,7 @@ export default function Dashboard() {
       if (!token) return;
       
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/bookings/my-bookings",
+        "http://localhost:5003/api/bookings/my-bookings",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -168,7 +168,7 @@ export default function Dashboard() {
   const fetchRedemptions = async () => {
     try {
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/rewards/my-rewards",
+        "http://localhost:5003/api/rewards/my-rewards",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -213,7 +213,7 @@ export default function Dashboard() {
       }
       
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/green-points/my-points",
+        "http://localhost:5003/api/green-points/my-points",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -308,7 +308,7 @@ export default function Dashboard() {
       console.log('ttttttoooooooo',token)
 
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/rewards/redeem",
+        "http://localhost:5003/api/rewards/redeem",
         {
           method: 'POST',
           headers: {
