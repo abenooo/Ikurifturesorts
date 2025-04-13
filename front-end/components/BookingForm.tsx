@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css"
 import { BookingFormData, ServiceVariant, TimeSlot } from '@/types/booking'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
+import { useUserStore } from '@/store/userStore'
 
 const serviceVariants: ServiceVariant[] = [
   {
@@ -50,11 +51,12 @@ export default function BookingForm() {
     variant: '',
     totalPrice: 0,
     totalPoints: 0,
-    notes: ''
   })
   const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [userPoints, setUserPoints] = useState(0)
+  const {user,token} = useUserStore();
+  const [service, setService] = useState<ServiceVariant | null>(null)
 
   useEffect(() => {
     // Fetch user points from localStorage or API
@@ -94,6 +96,7 @@ export default function BookingForm() {
         totalPrice,
         totalPoints
       }))
+      setService(selectedVariant)
     }
   }, [formData.guests, formData.variant])
 
@@ -106,38 +109,48 @@ export default function BookingForm() {
     setIsLoading(true)
 
     try {
-      const userData = localStorage.getItem('userData')
+      const userData = localStorage.getItem('kuriftuUser')
       if (!userData) {
         toast.error('Please log in to make a booking')
         router.push('/login')
         return
       }
 
-      const { userId } = JSON.parse(userData)
+      const parsedUser = JSON.parse(userData)
+      const userId = parsedUser.user?._id || parsedUser._id
+
       const bookingData = {
-        ...formData,
+        serviceId: service?.id,
+        startDate: formData.startDate.toISOString(),
+        endDate: formData.endDate.toISOString(),
+        time: formData.time,
+        guests: formData.guests,
+        variant: formData.variant,
+        totalPrice: formData.totalPrice,
+        totalPoints: formData.totalPoints,
         userId
       }
 
-      const response = await fetch('/api/bookings', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bookings`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(bookingData)
       })
 
-      const data = await response.json()
-
-      if (data.success) {
-        toast.success('Booking successful!')
-        router.push(`/bookings/${data.bookingId}`)
-      } else {
-        throw new Error(data.error || 'Failed to create booking')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to create booking')
       }
+
+      const data = await response.json()
+      toast.success('Booking successful!')
+      router.push(`/dashboard`)
     } catch (error) {
       console.error('Booking error:', error)
-      toast.error('Failed to create booking. Please try again.')
+      toast.error(error instanceof Error ? error.message : 'Failed to create booking. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -225,17 +238,6 @@ export default function BookingForm() {
                 </div>
               ))}
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Additional Notes</label>
-            <textarea
-              value={formData.notes || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              rows={3}
-              placeholder="Any special requests or requirements?"
-            />
           </div>
 
           <div className="bg-gray-50 p-4 rounded-md">

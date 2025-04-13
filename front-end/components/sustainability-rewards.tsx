@@ -36,7 +36,7 @@ export default function SustainabilityRewards() {
   useEffect(() => {
     const fetchGreenPoints = async () => {
       if (!token) return;
-
+      console.log('tttttttttttt',token)
       try {
         const [actionsResponse, pointsResponse] = await Promise.all([
           fetch("https://i-kuriftu.onrender.com/api/green-points/actions", {

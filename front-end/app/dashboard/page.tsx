@@ -300,8 +300,10 @@ export default function Dashboard() {
         return;
       }
 
+      console.log('ttttttoooooooo',token)
+
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/rewards/redeem",
+        "http://localhost:5003/api/rewards/redeem",
         {
           method: 'POST',
           headers: {

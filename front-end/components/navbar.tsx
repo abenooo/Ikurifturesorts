@@ -17,8 +17,9 @@ export default function Navbar() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const { user, token, setUser, clearUser } = useUserStore()
   
-  const navbarBg = isScrolled ? "bg-white shadow-md" : "bg-transparent"
-  const textColor = isScrolled ? "text-gray-800" : "text-white"
+  // Always use white background with shadow
+  const navbarBg = "bg-white shadow-md"
+  const textColor = "text-gray-800"
   const isDashboard = pathname === "/dashboard"
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export default function Navbar() {
             <div className="relative h-10 w-32">
               <Image src="https://imgs.search.brave.com/5yZpZgY7fxZbMon2wonPZpeWTEF06hWHW-6dkH8Bn8A/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dGhlb3JnLmNvbS85/OTI4ZmJjZS1hMGY2/LTRmM2UtOWJhMS01/YWQ1YWFkNzJkMzFf/dGh1bWIuanBn" alt="Kuriftu Rewards" fill className="object-contain" />
             </div>
-            <span className={`ml-2 font-semibold ${isDashboard || isScrolled ? "text-amber-800" : "text-white"}`}>
+            <span className={`ml-2 font-semibold text-amber-800`}>
               Rewards
             </span>
           </Link>
@@ -102,9 +103,9 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button className="md:hidden text-2xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? (
-              <X className={isDashboard || isScrolled ? "text-gray-800" : "text-white"} />
+              <X className="text-gray-800" />
             ) : (
-              <Menu className={isDashboard || isScrolled ? "text-gray-800" : "text-white"} />
+              <Menu className="text-gray-800" />
             )}
           </button>
         </div>

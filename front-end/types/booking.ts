@@ -29,7 +29,6 @@ export interface BookingFormData {
   variant: string
   totalPrice: number
   totalPoints: number
-  notes?: string
   userId?: string
 }
 
