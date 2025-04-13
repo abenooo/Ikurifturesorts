@@ -45,7 +45,7 @@ router.post('/', auth, async (req, res) => {
         message: 'End date must be after start date' 
       });
     }
-
+    const user = await User.findById(req.user._id);
     // Validate guests count
     if (guests < 1 || guests > service.maxGuests) {
       return res.status(400).json({ 
@@ -57,7 +57,7 @@ router.post('/', auth, async (req, res) => {
     // Create new booking
     const booking = new Booking({
       service: serviceId,
-      user: req.user._id,
+      user: user._id,
       startDate: start,
       endDate: end,
       time,
