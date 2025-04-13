@@ -17,7 +17,6 @@ router.post('/', auth, async (req, res) => {
       variant,
       totalPrice,
       totalPoints,
-      notes
     } = req.body;
 
     // Validate required fields
@@ -66,7 +65,6 @@ router.post('/', auth, async (req, res) => {
       variant,
       totalPrice,
       totalPoints: totalPoints || 0,
-      notes: notes || '',
       status: 'pending'
     });
 
