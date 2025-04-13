@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth');
 const Booking = require('../models/Booking');
 const Service = require('../models/Service');
 const User = require('../models/User');
+const authMiddleware = require('../middleware/authMiddleware');
 
 // Create a new booking
-router.post('/', auth, async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const {
       serviceId,
@@ -18,7 +18,7 @@ router.post('/', auth, async (req, res) => {
       totalPrice,
       totalPoints,
     } = req.body;
-
+    console.log(req.body,'req.body')
     // Validate required fields
     if (!serviceId || !startDate || !endDate || !time || !guests || !variant || !totalPrice) {
       return res.status(400).json({ 
@@ -53,7 +53,7 @@ router.post('/', auth, async (req, res) => {
         message: `Number of guests must be between 1 and ${service.maxGuests}` 
       });
     }
-
+  console.log(user,'ussssssserrrr')
     // Create new booking
     const booking = new Booking({
       service: serviceId,
@@ -94,7 +94,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Get user's bookings
-router.get('/my-bookings', auth, async (req, res) => {
+router.get('/my-bookings', authMiddleware, async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user._id })
       .populate('service', 'name description images')
@@ -114,7 +114,7 @@ router.get('/my-bookings', auth, async (req, res) => {
 });
 
 // Get booking by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id)
       .populate('service', 'name description images');
@@ -148,7 +148,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Cancel booking
-router.put('/:id/cancel', auth, async (req, res) => {
+router.put('/:id/cancel', async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
 
@@ -193,7 +193,7 @@ router.put('/:id/cancel', auth, async (req, res) => {
 });
 
 // Update booking status (admin only)
-router.put('/:id/status', auth, async (req, res) => {
+router.put('/:id/status', async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {

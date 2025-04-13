@@ -131,22 +131,51 @@ export function BookingForm({ service, userPoints }: BookingFormProps) {
   // Handle booking submission
   const handleBooking = async () => {
     if (!startDate || !selectedTime) {
-      alert("Please select at least a start date and time")
+      toast.error("Please select at least a start date and time")
+      return
+    }
+
+    if (!token) {
+      toast.error("Please log in to make a booking")
       return
     }
 
     setIsLoading(true)
 
-    // Add 3-minute delay
-    await new Promise(resolve => setTimeout(resolve, 3000)) // 180000 ms = 3 minutes
-
     try {
-      toast.success("Booking is successfull")
+      const bookingData = {
+        serviceId: service.id,
+        startDate: startDate.toISOString(),
+        endDate: endDate?.toISOString() || startDate.toISOString(),
+        time: selectedTime,
+        guests: guests,
+        variant: selectedVariant.id,
+        totalPrice: calculateTotal(),
+        totalPoints: calculateRewardPoints(),
+      }
+
+      const response = await fetch(`https://kuriftu-api.onrender.com/api/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(bookingData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to create booking')
+      }
+
+      const data = await response.json()
+      toast.success('Booking successful!')
+      router.push('/dashboard')
     } catch (error) {
-      toast.success("Booking is successfull")
+      console.error('Booking error:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to create booking. Please try again.')
     } finally {
       setIsLoading(false)
-      router.push('/services')
     }
   }
 

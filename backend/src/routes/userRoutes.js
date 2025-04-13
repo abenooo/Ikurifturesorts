@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth');
+const authMiddleware = require('../middleware/authMiddleware');
 const {
   register,
   login,
@@ -127,12 +127,12 @@ router.post('/login', async (req, res) => {
 });
 
 // Protected routes
-router.get('/profile', auth, getProfile);
-router.put('/profile', auth, updateProfile);
-router.get('/membership-benefits', auth, getMembershipBenefits);
+router.get('/profile', authMiddleware, getProfile);
+router.put('/profile', authMiddleware, updateProfile);
+router.get('/membership-benefits', authMiddleware, getMembershipBenefits);
 
 // Get user activities
-router.get('/activities', auth, async (req, res) => {
+router.get('/activities', authMiddleware, async (req, res) => {
   try {
     const activities = await Activity.find({ user: req.user.id })
       .sort({ createdAt: -1 })
@@ -146,7 +146,7 @@ router.get('/activities', auth, async (req, res) => {
 });
 
 // Create new activity
-router.post('/activities', auth, async (req, res) => {
+router.post('/activities', authMiddleware, async (req, res) => {
   try {
     const { type, amount, description } = req.body;
     
@@ -172,7 +172,7 @@ router.post('/activities', auth, async (req, res) => {
 });
 
 // Get user's bookings
-router.get('/bookings', auth, async (req, res) => {
+router.get('/bookings', authMiddleware, async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user._id })
       .sort({ date: -1 })
@@ -185,7 +185,7 @@ router.get('/bookings', auth, async (req, res) => {
 });
 
 // Get user's redemptions
-router.get('/redemptions', auth, async (req, res) => {
+router.get('/redemptions', authMiddleware, async (req, res) => {
   try {
     const redemptions = await Redemption.find({ user: req.user._id })
       .sort({ date: -1 })

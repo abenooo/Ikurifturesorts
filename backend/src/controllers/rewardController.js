@@ -1,6 +1,8 @@
 const Reward = require('../models/Reward');
 const UserReward = require('../models/UserReward');
 const User = require('../models/User');
+const authMiddleware = require('../middleware/authMiddleware');
+
 
 // Get all available rewards
 const getAvailableRewards = async (req, res) => {

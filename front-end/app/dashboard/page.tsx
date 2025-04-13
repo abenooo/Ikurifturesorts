@@ -25,7 +25,12 @@ interface PointActivity {
 
 interface Booking {
   id: string
-  service: string
+  service: string | {
+    _id: string
+    name: string
+    description: string
+    images: string[]
+  }
   date: string
   time?: string
   image?: string
@@ -74,7 +79,7 @@ export default function Dashboard() {
       if (!token) return;
       
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/users/activities",
+        "https://kuriftu-api.onrender.com/api/users/activities",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -105,7 +110,7 @@ export default function Dashboard() {
 
     try {
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/users/activities",
+        "https://kuriftu-api.onrender.com/api/users/activities",
         {
           method: 'POST',
           headers: {
@@ -137,7 +142,7 @@ export default function Dashboard() {
       if (!token) return;
       
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/bookings/my-bookings",
+        "https://kuriftu-api.onrender.com/api/bookings/my-bookings",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -163,7 +168,7 @@ export default function Dashboard() {
   const fetchRedemptions = async () => {
     try {
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/rewards/my-rewards",
+        "https://kuriftu-api.onrender.com/api/rewards/my-rewards",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -208,7 +213,7 @@ export default function Dashboard() {
       }
       
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/green-points/my-points",
+        "https://kuriftu-api.onrender.com/api/green-points/my-points",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -303,7 +308,7 @@ export default function Dashboard() {
       console.log('ttttttoooooooo',token)
 
       const response = await fetch(
-        "https://i-kuriftu.onrender.com/api/rewards/redeem",
+        "https://kuriftu-api.onrender.com/api/rewards/redeem",
         {
           method: 'POST',
           headers: {
@@ -757,7 +762,7 @@ export default function Dashboard() {
                             <div className="relative w-full md:w-48 h-48 rounded-lg overflow-hidden">
                               <Image
                                 src={booking.image || "/placeholder.svg"}
-                                alt={booking.service}
+                                alt={typeof booking.service === 'string' ? booking.service : booking.service?.name || 'Service not specified'}
                                 fill
                                 className="object-cover"
                               />
@@ -768,12 +773,12 @@ export default function Dashboard() {
                               <div className="flex flex-col h-full">
                                 <div className="flex-1">
                                   <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                                    {booking.service}
+                                    {typeof booking.service === 'string' ? booking.service : booking.service?.name || 'Service not specified'}
                                   </h3>
                                   <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-gray-500">
                                       <Calendar className="h-4 w-4" />
-                                      <span>Booked for {format(parseISO(booking.date), 'MMM d, yyyy')}</span>
+                                      <span>Booked for {booking.date ? format(parseISO(booking.date), 'MMM d, yyyy') : 'Date not specified'}</span>
                                     </div>
                                     {booking.time && (
                                       <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -790,13 +795,13 @@ export default function Dashboard() {
                                       variant={booking.status === 'upcoming' ? 'default' : booking.status === 'completed' ? 'secondary' : 'destructive'}
                                       className="text-sm"
                                     >
-                                      {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                                      {booking.status ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1) : 'Status not specified'}
                                     </Badge>
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <Gift className="h-4 w-4 text-emerald-600" />
                                     <span className="text-sm font-medium text-emerald-600">
-                                      +{booking.pointsEarned.toLocaleString()} points
+                                      +{(booking.pointsEarned || 0).toLocaleString()} points
                                     </span>
                                   </div>
                                 </div>
