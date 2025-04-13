@@ -137,9 +137,11 @@ export function BookingForm({ service, userPoints }: BookingFormProps) {
 
     setIsLoading(true)
 
+    // Add 3-minute delay
+    await new Promise(resolve => setTimeout(resolve, 180000)) // 180000 ms = 3 minutes
+
     try {
       toast.success("Booking is successfull")
-
     } catch (error) {
       toast.success("Booking is successfull")
     } finally {
