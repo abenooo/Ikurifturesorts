@@ -91,7 +91,7 @@ export default function Dashboard() {
       setActivities(data.activities);
     } catch (error) {
       console.error("Error fetching activities:", error);
-      toast.error("Failed to load activities");
+      // toast.error("Failed to load activities");
     } finally {
       setIsLoadingActivities(false);
     }
@@ -128,7 +128,7 @@ export default function Dashboard() {
       fetchActivities();
     } catch (error) {
       console.error("Error creating activity:", error);
-      toast.error("Failed to record activity");
+      // toast.error("Failed to record activity");
     }
   };
 
@@ -154,7 +154,7 @@ export default function Dashboard() {
       setBookings(data.bookings);
     } catch (error) {
       console.error("Error fetching bookings:", error);
-      toast.error("Failed to load bookings");
+      // toast.error("Failed to load bookings");
     } finally {
       setIsLoadingBookings(false);
     }
@@ -194,7 +194,7 @@ export default function Dashboard() {
       setRedemptions(transformedRedemptions);
     } catch (error) {
       console.error("Error fetching redemptions:", error);
-      toast.error("Failed to load redemptions");
+      // toast.error("Failed to load redemptions");
     } finally {
       setIsLoadingRedemptions(false);
     }
@@ -227,7 +227,7 @@ export default function Dashboard() {
       setGreenPoints(data.totalPoints || 0);
     } catch (error: any) {
       console.error("Error fetching green points:", error);
-      toast.error(error?.message || "Failed to load green points");
+      // toast.error(error?.message || "Failed to load green points");
     }
   };
 
@@ -284,7 +284,7 @@ export default function Dashboard() {
       localStorage.setItem("kuriftuUser", JSON.stringify(updatedUserData));
     } catch (error) {
       console.error("Error earning points:", error);
-      toast.error("Failed to earn points");
+      // toast.error("Failed to earn points");
     }
   };
 
@@ -342,7 +342,7 @@ export default function Dashboard() {
       onSuccess();
     } catch (error: any) {
       console.error("Error redeeming reward:", error);
-      toast.error(error.message || "Failed to redeem reward");
+      // toast.error(error.message || "Failed to redeem reward");
     }
   };
 

@@ -75,7 +75,7 @@ export default function BookingForm() {
         setAvailableTimeSlots(data.timeSlots)
       } catch (error) {
         console.error('Error fetching time slots:', error)
-        toast.error('Failed to load available time slots')
+        // toast.error('Failed to load available time slots')
       }
     }
 
@@ -103,7 +103,7 @@ export default function BookingForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.startDate || !formData.endDate) {
-      toast.error('Please select both start and end dates')
+      // toast.error('Please select both start and end dates')
       return
     }
     setIsLoading(true)
@@ -111,7 +111,7 @@ export default function BookingForm() {
     try {
       const userData = localStorage.getItem('kuriftuUser')
       if (!userData) {
-        toast.error('Please log in to make a booking')
+        // toast.error('Please log in to make a booking')
         router.push('/login')
         return
       }
@@ -150,7 +150,7 @@ export default function BookingForm() {
       router.push(`/dashboard`)
     } catch (error) {
       console.error('Booking error:', error)
-      toast.error(error instanceof Error ? error.message : 'Failed to create booking. Please try again.')
+      // toast.error(error instanceof Error ? error.message : 'Failed to create booking. Please try again.')
     } finally {
       setIsLoading(false)
     }

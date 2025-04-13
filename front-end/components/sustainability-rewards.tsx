@@ -76,7 +76,7 @@ export default function SustainabilityRewards() {
         setIsAuthenticated(true);
       } catch (error) {
         console.error("Error fetching green points:", error);
-        toast.error("Failed to load green points data");
+        // toast.error("Failed to load green points data");
       } finally {
         setIsLoading(false);
       }
@@ -142,7 +142,7 @@ export default function SustainabilityRewards() {
       setShowAuthPopup(false);
     } catch (error) {
       console.error("Error submitting green actions:", error);
-      toast.error("Failed to submit green actions");
+      // toast.error("Failed to submit green actions");
     } finally {
       setIsSubmitting(false);
     }

@@ -73,7 +73,7 @@ export default function RewardsCatalog({ userPoints, onRedeemReward }: RewardsCa
         setRewards(transformedRewards);
       } catch (error) {
         console.error("Error fetching rewards:", error);
-        toast.error("Failed to load rewards");
+        // toast.error("Failed to load rewards");
       } finally {
         setIsLoading(false);
       }

@@ -138,7 +138,7 @@ export default function MembershipTiers() {
         setTiers(mockTiers)
       } catch (error) {
         console.error("Error fetching tiers:", error)
-        toast.error("Failed to load membership tiers")
+        // toast.error("Failed to load membership tiers")
       } finally {
         setIsLoading(false)
       }
