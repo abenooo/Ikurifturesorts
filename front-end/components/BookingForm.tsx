@@ -43,12 +43,14 @@ const serviceVariants: ServiceVariant[] = [
 export default function BookingForm() {
   const router = useRouter()
   const [formData, setFormData] = useState<BookingFormData>({
-    date: new Date(),
+    startDate: null,
+    endDate: null,
     time: '',
     guests: 1,
-    variant: 'standard',
+    variant: '',
     totalPrice: 0,
-    totalPoints: 0
+    totalPoints: 0,
+    notes: ''
   })
   const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -66,7 +68,7 @@ export default function BookingForm() {
   useEffect(() => {
     const fetchTimeSlots = async () => {
       try {
-        const response = await fetch(`/api/bookings?date=${formData.date.toISOString()}`)
+        const response = await fetch(`/api/bookings?date=${formData.startDate?.toISOString()}`)
         const data = await response.json()
         setAvailableTimeSlots(data.timeSlots)
       } catch (error) {
@@ -75,10 +77,10 @@ export default function BookingForm() {
       }
     }
 
-    if (formData.date) {
+    if (formData.startDate) {
       fetchTimeSlots()
     }
-  }, [formData.date])
+  }, [formData.startDate])
 
   useEffect(() => {
     // Calculate total price and points whenever relevant fields change
@@ -97,6 +99,10 @@ export default function BookingForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!formData.startDate || !formData.endDate) {
+      toast.error('Please select both start and end dates')
+      return
+    }
     setIsLoading(true)
 
     try {
@@ -144,12 +150,24 @@ export default function BookingForm() {
         
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Date</label>
+            <label className="block text-sm font-medium text-gray-700">Start Date</label>
             <DatePicker
-              selected={formData.date}
-              onChange={(date: Date | null) => setFormData(prev => ({ ...prev, date: date || new Date() }))}
+              selected={formData.startDate}
+              onChange={(date) => setFormData({ ...formData, startDate: date })}
               minDate={new Date()}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              className="w-full p-2 border rounded"
+              placeholderText="Select date"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">End Date</label>
+            <DatePicker
+              selected={formData.endDate}
+              onChange={(date) => setFormData({ ...formData, endDate: date })}
+              minDate={formData.startDate || new Date()}
+              className="w-full p-2 border rounded"
+              placeholderText="Select date"
             />
           </div>
 
