@@ -9,75 +9,68 @@ import { Button } from "@/components/ui/button"
 import { useUserStore } from "@/store/userStore"
 import AuthModal from "./auth-modal"
 
-interface UserData {
-  name: string
-  email: string
-  points: number
-  tier: string
-  joinDate: string
-}
-
 export default function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [userData, setUserData] = useState<UserData | null>(null)
+  const [userData, setUserData] = useState<any>(null)
   const { user, token, setUser, clearUser } = useUserStore()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  // const {user:userProfile} = user;
+  
+  const navbarBg = isScrolled ? "bg-white shadow-md" : "bg-transparent"
+  const textColor = isScrolled ? "text-gray-800" : "text-white"
+  const isDashboard = pathname === "/dashboard"
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true)
-      } else {
-        setIsScrolled(false)
+      setIsScrolled(window.scrollY > 10)
+    }
+
+    // Hydrate user from localStorage if exists
+    const storedUser = localStorage.getItem("kuriftuUser")
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser)
+        setUserData(parsedUser)
+        // Access the nested user object
+        const actualUser = parsedUser.state?.user?.user || parsedUser.user || parsedUser
+        const actualToken = parsedUser.state?.user?.token || parsedUser.token
+        if (actualUser) {
+          setUser(actualUser, actualToken)
+        }
+      } catch (e) {
+        console.error("Failed to parse user data", e)
       }
     }
 
-    // Check for logged in user
-    // if (storedUser) {
-    //   setUserData(JSON.parse(storedUser))
-    // }
-
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-  const handleEarnPoints = (amount: number, description: string) => {
-    // Check if user is logged in
-    const storedUser = localStorage.getItem("kuriftuUser")
-    if (!storedUser) {
-      // If not logged in, open auth modal
-      setIsAuthModalOpen(true)
-      return
+  }, [setUser])
+
+  const handleLogin = (userData: any) => {
+    // Normalize the structure before saving
+    const userToStore = {
+      state: {
+        user: {
+          user: userData.user || userData,
+          token: userData.token
+        },
+        token: userData.token,
+        isHydrated: true
+      },
+      version: 0
     }
-
-    // If logged in, navigate to dashboard
-    router.push("/dashboard")
+    localStorage.setItem("kuriftuUser", JSON.stringify(userToStore))
+    setUser(userData.user || userData, userData.token)
   }
-  const isDashboard = pathname === "/dashboard"
-  const navbarBg = isDashboard
-    ? "bg-white shadow-md py-2"
-    : isScrolled
-      ? "bg-white shadow-md py-2"
-      : "bg-transparent py-4"
-
-  const textColor = isDashboard || isScrolled ? "text-black" : "text-green-500"
 
   const handleLogout = () => {
     localStorage.removeItem("kuriftuUser")
-    setUserData(null)
-    setUser(null, null)
     clearUser()
     router.push("/")
   }
-  const handleLogin = (userData: any) => {
-    // Store user data in localStorage for persistence
-    localStorage.setItem("kuriftuUser", JSON.stringify(userData))
-    setUser(userData, token)
-  }
- console.log("uuuuuuuuusssserrrrr",user);
+
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navbarBg}`}>
       <div className="container mx-auto px-4 md:px-6">
@@ -86,7 +79,6 @@ export default function Navbar() {
           <Link href="/" className="flex items-center">
             <div className="relative h-10 w-32">
               <Image src="https://imgs.search.brave.com/5yZpZgY7fxZbMon2wonPZpeWTEF06hWHW-6dkH8Bn8A/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dGhlb3JnLmNvbS85/OTI4ZmJjZS1hMGY2/LTRmM2UtOWJhMS01/YWQ1YWFkNzJkMzFf/dGh1bWIuanBn" alt="Kuriftu Rewards" fill className="object-contain" />
-
             </div>
             <span className={`ml-2 font-semibold ${isDashboard || isScrolled ? "text-amber-800" : "text-white"}`}>
               Rewards
@@ -95,61 +87,44 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <>
-
-
-              <Link
-                href="/membership"
-                className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}
-              >
-                Membership Tiers
-              </Link>
-              <Link
-                href="/services"
-                className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}
-              >
-                Services
-              </Link>
-              <Link
-                href="/ai-experience"
-                className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}
-              >
-                AI Experience
-              </Link>
-              <Link
-                href="/sustainability"
-                className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}
-              >
-                Sustainability
-              </Link>
-              {user && <>
-
-
+            <Link href="/membership" className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}>
+              Membership Tiers
+            </Link>
+            <Link href="/services" className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}>
+              Services
+            </Link>
+            <Link href="/ai-experience" className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}>
+              AI Experience
+            </Link>
+            <Link href="/sustainability" className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}>
+              Sustainability
+            </Link>
+            
+            {user ? (
+              <>
                 <Link href="/dashboard" className={`font-medium hover:text-amber-600 transition-colors ${textColor}`}>
                   Dashboard
                 </Link>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-md border border-amber-200">
                     <User className="h-4 w-4 text-amber-600" />
-                    <span className="text-sm font-medium text-gray-800">{user.loyaltyPoints?.toLocaleString() || '0'} points</span>
+                    <span className="text-sm font-medium text-gray-800">
+                      {(user.loyaltyPoints || 0).toLocaleString()} points
+                    </span>
                   </div>
                   <Button variant="outline" onClick={handleLogout} className="h-8">
                     Logout
                   </Button>
                 </div>
               </>
-              }
-            </>
-            {!user && (
-              <>
-                <Link
-                  onClick={() => setIsAuthModalOpen(true)}
-                  href=""
-                  className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-full transition-colors"
-                >
-                  Join Now
-                </Link>
-              </>
+            ) : (
+              <Link
+                onClick={() => setIsAuthModalOpen(true)}
+                href=""
+                className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-full transition-colors"
+              >
+                Join Now
+              </Link>
             )}
           </nav>
 
@@ -169,68 +144,45 @@ export default function Navbar() {
         <div className="md:hidden bg-white shadow-lg">
           <div className="container mx-auto px-4 py-4">
             <nav className="flex flex-col space-y-4">
-              <>
-                <Link
-                  href="/membership"
-                  className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Membership Tiers
-                </Link>
-                <Link
-                  href="/services"
-                  className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Services
-                </Link>
-                <Link
-                  href="/ai-experience"
-                  className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  AI Experience
-                </Link>
-                <Link
-                  href="/sustainability"
-                  className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Sustainability
-                </Link>
-                {user && <>
-
-                  <Link
-                    href="/dashboard"
-                    className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
+              <Link href="/membership" className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2" onClick={() => setIsMenuOpen(false)}>
+                Membership Tiers
+              </Link>
+              <Link href="/services" className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2" onClick={() => setIsMenuOpen(false)}>
+                Services
+              </Link>
+              <Link href="/ai-experience" className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2" onClick={() => setIsMenuOpen(false)}>
+                AI Experience
+              </Link>
+              <Link href="/sustainability" className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2" onClick={() => setIsMenuOpen(false)}>
+                Sustainability
+              </Link>
+              
+              {user ? (
+                <>
+                  <Link href="/dashboard" className="font-medium text-gray-800 hover:text-amber-600 transition-colors py-2" onClick={() => setIsMenuOpen(false)}>
                     Dashboard
                   </Link>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2 bg-amber-50 px-3 py-2 rounded-md border border-amber-200">
                       <User className="h-4 w-4 text-amber-600" />
-                      <span className="text-sm font-medium text-gray-800">{userData?.points?.toLocaleString() || '0'} points</span>
+                      <span className="text-sm font-medium text-gray-800">
+                        {(user.loyaltyPoints || 0).toLocaleString()} points
+                      </span>
                     </div>
                     <Button variant="outline" onClick={handleLogout} className="h-8">
                       Logout
                     </Button>
                   </div>
-                </>}
-              </>
-              {!user && (
-                <>
-                  <Link
-                    href=""
-                    className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-full transition-colors inline-block text-center"
-
-                    onClick={() => setIsAuthModalOpen(true)}
-                  >
-                    Join Now
-                  </Link>
                 </>
+              ) : (
+                <Link
+                  href=""
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded-full transition-colors inline-block text-center"
+                  onClick={() => setIsAuthModalOpen(true)}
+                >
+                  Join Now
+                </Link>
               )}
-
             </nav>
           </div>
         </div>
