@@ -13,6 +13,7 @@ import { useUserStore, rehydrateStore } from "@/store/userStore"
 import type { UserData } from "@/store/userStore"
 import { useRouter } from "next/navigation"
 import WaysToEarn from "@/components/ways-to-earn"
+import ChatbaseEmbed from "@/components/chat/bot"
 
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -167,6 +168,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <ChatbaseEmbed />
     </main>
   )
 }
