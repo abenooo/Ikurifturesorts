@@ -14,6 +14,7 @@ import type { UserData } from "@/store/userStore"
 import { useRouter } from "next/navigation"
 import WaysToEarn from "@/components/ways-to-earn"
 import ChatbaseEmbed from "@/components/chat/bot"
+import backgroundImage from "../images/background.jpg"
 
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -50,7 +51,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           <div className="relative w-full h-full">
             <Image
-              src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+             src={backgroundImage}
               alt="Kuriftu Resort"
               fill
               className="object-cover brightness-[0.7]"

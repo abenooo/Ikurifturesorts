@@ -45,17 +45,12 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Move AuthModal outside of the header structure */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onLogin={handleLogin} />
 
-      {/* Reduced top spacing */}
-      <div className="h-3 md:h-10"></div>
-
-      {/* Make the header sticky with reduced top position */}
-      <header className="sticky top-3 w-full z-50 transition-all duration-300 mb-6">
-        {/* Reduced top margin */}
+      {/* Update header positioning */}
+      <header className="fixed top-3 left-0 right-0 z-50 transition-all duration-300">
         <div
-          className={`max-w-4xl mx-auto px-4 py-3 md:mt-2 md:mb-6 md:rounded-full md:border md:border-gray-200 md:shadow-sm ${navbarBg}`}
+          className={`max-w-4xl mx-auto px-4 py-3 md:mt-2 md:rounded-full md:border md:border-gray-200 md:shadow-sm ${navbarBg}`}
         >
           <div className="flex items-center justify-between relative">
             {/* Logo section - left aligned with circular image like in screenshot */}
@@ -205,9 +200,6 @@ export default function Navbar() {
           </div>
         )}
       </header>
-
-      {/* Add space at the bottom to match the top */}
-      <div className="h-3 md:h-6"></div>
     </>
   )
 }
