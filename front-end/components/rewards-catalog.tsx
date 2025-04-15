@@ -47,7 +47,7 @@ export default function RewardsCatalog({ userPoints, onRedeemReward }: RewardsCa
     const fetchRewards = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5003/api/rewards",
+          "https://i-kuriftu.onrender.com/api/rewards",
           {
             headers: {
               Authorization: `Bearer ${token}`,
