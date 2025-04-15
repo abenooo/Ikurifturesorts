@@ -45,6 +45,9 @@ export default function Navbar() {
 
   return (
     <>
+      {/* Move AuthModal outside of the header structure */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onLogin={handleLogin} />
+
       {/* Reduced top spacing */}
       <div className="h-3 md:h-10"></div>
 
@@ -55,8 +58,6 @@ export default function Navbar() {
           className={`max-w-4xl mx-auto px-4 py-3 md:mt-2 md:mb-6 md:rounded-full md:border md:border-gray-200 md:shadow-sm ${navbarBg}`}
         >
           <div className="flex items-center justify-between relative">
-            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onLogin={handleLogin} />
-
             {/* Logo section - left aligned with circular image like in screenshot */}
             <Link href="/" className="flex items-center z-10 pr-2">
               <div className="relative h-8 w-8 rounded-full overflow-hidden">
