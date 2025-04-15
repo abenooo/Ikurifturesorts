@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation"
 import WaysToEarn from "@/components/ways-to-earn"
 import ChatbaseEmbed from "@/components/chat/bot"
 import backgroundImage from "../images/background.jpg"
+import Footer from "@/components/footer"
 
 export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
@@ -149,26 +150,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer & Waitlist Section */}
-      <section id="join-now" className="py-16 bg-stone-900 text-white">
-        <div className="container px-4 md:px-6 mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Stays?</h2>
-            <p className="text-xl text-stone-300 max-w-2xl mx-auto">
-              Join our waitlist to be the first to experience Kuriftu's revolutionary loyalty program.
-            </p>
-          </div>
-
-          <div className="max-w-md mx-auto">
-            <WaitlistForm />
-          </div>
-
-          <div className="mt-12 text-center text-stone-400">
-            <p>Hackathon prototype. Coming 2025!</p>
-            <p className="mt-4">© 2025 Kuriftu Resorts. All rights reserved.</p>
-          </div>
-        </div>
-      </section>
+      <Footer />
       <ChatbaseEmbed />
     </main>
   )
