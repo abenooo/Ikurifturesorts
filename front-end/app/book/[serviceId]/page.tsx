@@ -26,7 +26,7 @@ export default function BookingPage() {
       try {
         const serviceId = params.serviceId as string
         console.log('sssssrrrrr',)
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/services/${serviceId}`)
+        const response = await fetch(`https://i-kuriftu.onrender.com/api/services/${serviceId}`)
         if (!response.ok) {
           throw new Error('Failed to fetch service details')
         }

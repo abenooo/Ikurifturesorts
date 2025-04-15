@@ -32,14 +32,18 @@ export default function ServicesShowcase() {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/services`)
+        const response = await fetch(`https://i-kuriftu.onrender.com/api/services`)
         if (!response.ok) {
-          throw new Error('Failed to fetch services')
+          throw new Error(`HTTP error! status: ${response.status}`)
         }
         const data = await response.json()
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format received from API')
+        }
         setServices(data)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred')
+        console.error('Error fetching services:', err)
+        setError(err instanceof Error ? err.message : 'An error occurred while fetching services')
       } finally {
         setLoading(false)
       }
